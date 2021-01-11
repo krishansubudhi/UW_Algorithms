@@ -8,7 +8,6 @@ class QuickSelect:
 
     def kth_largest(self, data :list, k: int):
         self.data = data
-        random.seed(None)
         self.comparison_count = 0
         self.partition_count = 0
         assert k<=len(self.data) and k>0, 'K out of range'
@@ -66,10 +65,9 @@ class QuickSelectMedian(QuickSelect):
         self.median_of = median_of
     def get_pivot_index(self, start, end):
         randomIndex = [random.randint(start,end) for _ in range(self.median_of)]
-        # print(randomIndex)
+        # Use inbuilt sort
         randomIndex = sorted(randomIndex, key = lambda index: self.data[index])
         median = randomIndex[self.median_of//2]
-        # print(randomIndex)
         return median
 
     def __str__(self):
@@ -79,19 +77,22 @@ if __name__ == '__main__':
     import sys
     algos = [QuickSelect(), QuickSelectMedian(3), QuickSelectMedian(5)]
     iterations  =100
-    n = 100000
-    for q in algos:
-        print('\n',q)
-        comparisons = 0
-        partitions = 0
-        for _ in range(iterations):
-            data = [i for i in range(1,n)]
-            k = len(data)//2+1 #median
-            element = q.kth_largest(data, k)
-            comparisons += q.comparison_count
-            partitions += q.partition_count
-        print(f'Average partitions per run = {partitions/iterations}')
-        print(f'Average comparisons per run = {comparisons/iterations} = {comparisons/iterations/len(data)} n')
+    for n in [100000, 100000]:
+        print(f'\nn = {n}')
+        for q in algos:
+            random.seed(49)
+            print('\n',q)
+            comparisons = 0
+            partitions = 0
+            for _ in range(iterations):
+                data = [i for i in range(1,n)]
+                k = len(data)//2+1 #median
+                element = q.kth_largest(data, k)
+                comparisons += q.comparison_count
+                partitions += q.partition_count
+                print(q.partition_count)
+            print(f'Average pivot selection per run = {partitions/iterations}')
+            print(f'Average comparisons per run = {comparisons/iterations} = {comparisons/iterations/len(data)} n')
 
 
 

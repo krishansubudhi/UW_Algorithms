@@ -102,4 +102,42 @@ This means the algorithm does not generate all permutations with same probabilit
 
 \textbf{ Hence this algorithm does not generate perfectly uniform random permutations. }
 
+
+\newpage
+
+\exercise
+\emph {Q: a) Give a scheme to generate random numbers in the range 1, . . . , 6 that is as efficient as possible
+(in terms of the random bits). What is the expected number of bits you use?}
+
+A: To generate a random number from $1, ..., 6$ we will need at least 3 random bits. 
+On $000, 001,010,011, 100,101$  we will return $1,2,3,4,5,6$ respectively and on $110,111$ we start over.
+
+\begin{align*}
+E   &= \frac{6}{8} \ast 3 + \frac{2}{8} (E + 3)\\
+\implies 4E  &= 12 + E \\
+\implies E  &= 4
+\end{align*} 
+
+
+Hence, $3$ bits will be used on an average to generate random bits from $1,....,6$ efficiently. 
+
+\emph {Q: b)  Give a scheme to generate random numbers in the range 1, . . . , 9 that is as efficient as possible
+(in terms of the random bits). What is the expected number of bits you use?}
+
+A: To generate a random number from $1, ..., 9$ we will need at least 4 random bits.
+
+4 random bits can generate 16 different  outcomes with uniform probability - out of which 9 can be used to represent numbers from $1, ..., 9$. For other 7 outcomes the experiment needs to start over. 
+
+Hence,
+\begin{align*}
+    E & = \frac{9}{16} \ast 3 + \frac{7}{16} (E+4)\\
+    \implies 16E & = 36 + 7E + 28\\
+    \implies E & = \frac{64}{9} = 7\dfrac{1}{9} 
+\end{align*}
+
+We will use $7\dfrac{1}{9}$ expected number of bits.
+\newpage
+
+\exercise
+
 \end{document}

@@ -1,0 +1,105 @@
+\documentclass{homeworg}
+
+\title{CSEP 521, Winter 2021: Homework 1}
+\author{Krishan Subudhi (ksubudhi@uw.edu)}
+
+\begin{document}
+
+\maketitle
+
+\exercise
+Given,\\
+probability of heads = $p$ \\
+probability of tails = $q$,\\
+$q = 1 - p \ \text{and}\ p \neq q$
+
+\emph{Q:  How can you use this coin to generate an unbiased coin flip}
+
+A: We need a trick to turn the biased coin flip into an unbiased one. This is not possible with just one coin flip. Hence we need to come up with events with  multiple coin flips which will give an unbiased result.
+
+If we flip the coin twice, there are 4 possible outcomes. 
+\[
+HH, TT, HT, TH
+\]
+
+Out of these 4 outcomes
+\[P(HT) = P(TH) = pq\]
+
+Hence if results of both the flips different $(H->T,\ or\  T->H)$,\\
+then $ P(HT) = P(TH) = 1/2$   
+
+This will result in an unbiased coin flip. 
+
+So if X is a random variable representing number of coin flips to generate an unbiased coin flip, then 
+\begin{equation}
+\label{eq:p1Exp}
+\begin{split}
+    E[X]  = & P(HT\ \text{or}\ TH ) \ast 2 \\
+    + & P(HH) \ast (2 + E[X]) \\
+    + & P(TT) \ast (2 + E[X])
+\end{split}
+\end{equation}
+
+\ref{eq:p1Exp} states that if outcome of two coin flips are not same, then the value of X = 2 else calculate X by repeating the same process again.
+
+Hence
+\begin{equation}
+\begin{split}
+    E[X] & = (2 \ast pq) \ast 2 + p^2(2+E) + q^2(2+E) \\
+    & = 4 p(1-p) + p^2(2+E) + (1-p)^2(2+E) \\
+     & = 2+ 2 p^2E -2pE + E\\
+    \implies E & = \frac{1}{p(1-p)}
+\end{split}
+\end{equation}
+
+\textbf{$\frac{1}{p(1-p)}$ is the expected number of coin flips to generate an unbiased coin flip}
+\newpage
+
+\exercise
+
+\begin{verbatim}
+public static int[] Permutation(int n, Random rand) {
+    int[] arr = IdentityPermutation(n);
+    for (int i = 1; i < n; i++) {
+        int j = rand.Next(0, n);    // Random number in range 0..n-1
+        int temp = arr[i];          // Swap arr[i], arr[j]
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+    return arr;
+}
+\end{verbatim}
+
+\emph{Q: Show that this algorithm does not generate perfectly uniform random permutations.}
+
+A: The inner loop , which runs n-1 times, swaps the element at index $i$ with an element randomly chosen from all $n$ indexes.
+
+Hence, number of possible ways the algorithm generates a permutation = $n^{n-1}$
+
+As per definition, n items can be arranged among themselves in $n!$ number of ways.
+
+If the above algorithm had produced uniform random permutations, the algorithm should give equal probability to all the possible permutations. 
+
+i.e. 
+\[
+    n^{n-1} = k(n!)\quad, \text{for }n \in \mathbb{Z+}\quad, \text{where } k = \text{ positive integer}
+\]
+i.e. $n!$ is a factor of $n^{n-1}$.
+
+This is not true for all values of $n$. 
+
+\begin{equation*}
+\begin{split}
+    n^{n-1} &= n \ast n \ast \dots \ast n\quad, n-1\text{ times}\\
+    n! &= 1 \ast 2 \ast \dots \ast (n-1) \ast n\quad
+\end{split}
+\end{equation*}
+
+Since $n$ is not divisible by $n-1$, for all $n>2$ where $n \in \mathbb{Z+}$ 
+\[n^{n-1} \ne k(n!) \quad, \text{for all } n \in \mathbb{Z+}\]
+
+This means the algorithm does not generate all permutations with same probability for all values of $n$. Some of the permutations will have higher probability than $\frac{1}{n!}$ and some will have lower probability than $\frac{1}{n!}$
+
+\textbf{ Hence this algorithm does not generate perfectly uniform random permutations. }
+
+\end{document}

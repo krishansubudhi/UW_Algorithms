@@ -1,7 +1,7 @@
 \documentclass{homeworg}
 
 \title{CSEP 521, Winter 2021: Homework 1}
-\author{Krishan Subudhi (ksubudhi@uw.edu)}
+\author{Krishan Subudhi (ksubudhi@uw.edu) - 2040900}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{pythonhighlight}
@@ -192,9 +192,9 @@ Note: I have used python's inbuilt sorting algorithm to select the pivot for med
 
 \subsection{Summary}
 \begin{itemize}
-    \item The expected number of comparison is a constant multiple of the number of elements in the list.
+    \item The expected number of comparison is a constant multiple of the number of elements in the list. This mean quick select with random pivot has $O(n)$ expected run time.
     \item Algorithms where the pivot is selected randomly has higher expected comparisons compared to the algorithms where pivot is calculated from median of 3 or 5. This is because the pivot has higher chance of being towards the middle in the later algorithms resulting in better average case.
-    \item pivot selected Median of 5 outperforms pivot selected from median of 3. 
+    \item Median of 5 outperforms median of 3 as expected. This is also because of a better expected pivot. 
 \end{itemize}
 
 \subsection{Source code}

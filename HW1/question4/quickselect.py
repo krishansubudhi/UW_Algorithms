@@ -4,6 +4,8 @@ from the array. What is the expected number of comparisons that you do between d
 to find the median?
 '''
 import random
+import pandas as pd
+import collections
 class QuickSelect:
 
     def kth_largest(self, data :list, k: int):
@@ -76,23 +78,26 @@ class QuickSelectMedian(QuickSelect):
 if __name__ == '__main__':
     import sys
     algos = [QuickSelect(), QuickSelectMedian(3), QuickSelectMedian(5)]
-    iterations  =100
-    for n in [100000, 100000]:
-        print(f'\nn = {n}')
+    iterations  =10
+    results = []
+    for n in [100000]:
         for q in algos:
-            random.seed(49)
-            print('\n',q)
+            random.seed(47)
             comparisons = 0
             partitions = 0
             for _ in range(iterations):
-                data = [i for i in range(1,n)]
+                data = [i for i in range(1,n+1)]
                 k = len(data)//2+1 #median
                 element = q.kth_largest(data, k)
                 comparisons += q.comparison_count
                 partitions += q.partition_count
-                print(q.partition_count)
-            print(f'Average pivot selection per run = {partitions/iterations}')
-            print(f'Average comparisons per run = {comparisons/iterations} = {comparisons/iterations/len(data)} n')
-
-
-
+            
+            results.append(pd.Series({
+                'n':n,
+                'algorithm':str(q),
+                'expected partitions':partitions/iterations,
+                'expected comparisons' :f'{comparisons/iterations/n:.2f} n'
+            }))
+    df = pd.DataFrame(results).set_index(['n','algorithm'])
+    print(df)
+    print(df.to_latex(multirow = True, multicolumn_format = 'c'))

@@ -2,7 +2,9 @@
 
 \title{CSEP 521, Winter 2021: Homework 1}
 \author{Krishan Subudhi (ksubudhi@uw.edu)}
-
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{pythonhighlight}
 \begin{document}
 
 \maketitle
@@ -23,10 +25,11 @@ HH, TT, HT, TH
 \]
 
 Out of these 4 outcomes
-\[P(HT) = P(TH) = pq\]
+\begin{align*}
+P(HT) = P(TH) = pq\\
+P(HT | HT\ \text{or}\ TH) = P(TH | HT\ \text{or}\ TH) = 1/2
+\end{align*}
 
-Hence if results of both the flips different $(H->T,\ or\  T->H)$,\\
-then $ P(HT) = P(TH) = 1/2$   
 
 This will result in an unbiased coin flip. 
 
@@ -40,7 +43,7 @@ So if X is a random variable representing number of coin flips to generate an un
 \end{split}
 \end{equation}
 
-\ref{eq:p1Exp} states that if outcome of two coin flips are not same, then the value of X = 2 else calculate X by repeating the same process again.
+\ref{eq:p1Exp} states that if outcome of two consecutive coin flips are not same, then the value of X = 2 else calculate X by repeating the same process again.
 
 Hence
 \begin{equation}
@@ -84,9 +87,9 @@ i.e.
 \[
     n^{n-1} = k(n!)\quad, \text{for }n \in \mathbb{Z+}\quad, \text{where } k = \text{ positive integer}
 \]
-i.e. $n!$ is a factor of $n^{n-1}$.
+i.e. $n!$ must be a factor of $n^{n-1}$ for the algorithm to give equal probability to all outcomes.
 
-This is not true for all values of $n$. 
+However, this is not true for all values of $n$. 
 
 \begin{equation*}
 \begin{split}
@@ -139,5 +142,160 @@ We will use $7\dfrac{1}{9}$ expected number of bits.
 \newpage
 
 \exercise
+Partitions are the number of times a new pivot is selected. In other-words, partitions are the number of recursive operation run to find the median. 
+
+expected partitions = total partitions/iterations\\
+expected comparisons =total comparisons/iterations/n'\\
+Number of iterations per each row = 100
+
+\begin{table}[htbp]
+\label{q4:result}
+\caption{Results of quick select}
+\begin{tabular}{llrr}
+\toprule
+    &                          &  expected partitions  & expected comparisons \\
+n & algorithm &                                              &                                                 \\
+\midrule
+\multirow{3}{*}{10} & Quick select random pivot &                                         3.90 &                                          1.95 
+n \\
+    & Quick select Median of 3 &                                         3.25 &                                          1.61 n \\
+    & Quick select Median of 5 &                                         3.08 &                                          1.48 n \\
+\cline{1-4}
+\multirow{3}{*}{100} & Quick select random pivot &                                         7.99 &                                          3.13 n \\
+    & Quick select Median of 3 &                                         6.57 &                                          2.48 n \\
+    & Quick select Median of 5 &                                         6.21 &                                          2.26 n \\
+\cline{1-4}
+\multirow{3}{*}{1000} & Quick select random pivot &                13.16 &               3.39 n \\
+      & Quick select Median of 3 &                10.75 &               2.70 n \\
+      & Quick select Median of 5 &                10.13 &               2.45 n \\
+\cline{1-4}
+\multirow{3}{*}{10000} & Quick select random pivot &                18.02 &               3.50 n \\
+      & Quick select Median of 3 &                14.98 &               2.78 n \\
+      & Quick select Median of 5 &                13.64 &               2.58 n \\
+\cline{1-4}
+\multirow{3}{*}{100000} & Quick select random pivot &                 24.0 &               3.42 n \\
+       & Quick select Median of 3 &                 17.7 &               2.68 n \\
+       & Quick select Median of 5 &                 17.3 &               2.49 n \\
+\cline{1-4}
+\multirow{3}{*}{1000000} & Quick select random pivot &                 27.4 &               3.18 n \\
+        & Quick select Median of 3 &                 23.7 &               2.75 n \\
+        & Quick select Median of 5 &                 21.0 &               2.33 n \\
+\cline{1-4}
+\multirow{3}{*}{10000000} & Quick select random pivot &                 33.6 &               3.54 n \\
+         & Quick select Median of 3 &                 27.1 &               2.88 n \\
+         & Quick select Median of 5 &                 24.9 &               2.48 n \\
+
+\bottomrule
+\end{tabular}
+\end{table}
+Note: I have used python's inbuilt sorting algorithm to select the pivot from median of 3 and median of 5. Since 3 and 5 are very small values, this table ignores the comparisons to select pivot and only considers comparisons while partitioning the list around the pivot. 
+
+\subsection{Summary}
+\begin{itemize}
+    \item The expected number of comparison is a constant multiple of the number of elements in the list.
+    \item Algorithms where the pivot is selected random has higher expected comparisons compared to the alorthms where pivot is calculated from median of 3 or 5. This is because the pivot has higher chance of being towards the middle in the later algorithms resulting in better average case.
+    \item pivot selected Median of 5 outperforms pivot selected from median of 3. 
+\end{itemize}
+
+\subsection{Source code}
+\begin{python}
+
+import random
+import pandas as pd
+import collections
+class QuickSelect:
+
+    def kth_largest(self, data :list, k: int):
+        self.data = data
+        self.comparison_count = 0
+        self.partition_count = 0
+        assert k<=len(self.data) and k>0, 'K out of range'
+        element =  self._kth_largest(k, 0, len(data)-1)
+        return element
+    
+    def _kth_largest(self, k: int, start : int, end : int):
+        """
+        Given a list, find it's kth largest element using Quick select algorithm
+        """
+        # 1. select a random pivot
+        pivotIndex = self.get_pivot_index(start, end)
+        pivotIndex = self.partition(pivotIndex, start, end)
+        if end-pivotIndex >=k:
+            return self._kth_largest(k, pivotIndex+1, end)
+            
+        elif end-pivotIndex+1 == k:
+            return self.data[pivotIndex]
+        else:
+            return self._kth_largest(k-1-(end-pivotIndex), start , pivotIndex-1)
+
+    def partition(self, pivotIndex, start, end):
+        self.partition_count += 1
+        pivotValue = self.data[pivotIndex]
+        # Move pivot to right
+        self.swap(end , pivotIndex)
+        pivotIndex = end
+        leftIndex = start
+        # Loop till end-1.
+        for i in range(start, end):
+            self.comparison_count += 1
+            if data[i] < pivotValue:
+                self.swap(leftIndex, i)
+                leftIndex += 1
+        self.swap(leftIndex, pivotIndex)
+        return leftIndex
+    
+    def swap(self, i , j):
+        t = self.data[j]
+        self.data[j] = self.data[i]
+        self.data[i] = t
+
+    def get_pivot_index(self,start, end):
+        randomIndex = random.randint(start,end)
+        return randomIndex
+
+    def __str__(self):
+        return 'Quick select random pivot'
+
+class QuickSelectMedian(QuickSelect):
+    def __init__(self,median_of = 3):
+        self.median_of = median_of
+    def get_pivot_index(self, start, end):
+        randomIndex = [random.randint(start,end) for _ in range(self.median_of)]
+        # Use inbuilt sort
+        randomIndex = sorted(randomIndex, key = lambda index: self.data[index])
+        median = randomIndex[self.median_of//2]
+        return median
+
+    def __str__(self):
+        return f'Quick select Median of {self.median_of}'
+
+if __name__ == '__main__':
+    import sys
+    algos = [QuickSelect(), QuickSelectMedian(3), QuickSelectMedian(5)]
+    iterations  =10
+    results = []
+    for n in [100000]:
+        for q in algos:
+            random.seed(47)
+            comparisons = 0
+            partitions = 0
+            for _ in range(iterations):
+                data = [i for i in range(1,n+1)]
+                k = len(data)//2+1 #median
+                element = q.kth_largest(data, k)
+                comparisons += q.comparison_count
+                partitions += q.partition_count
+            
+            results.append(pd.Series({
+                'n':n,
+                'algorithm':str(q),
+                'expected partitions':partitions/iterations,
+                'expected comparisons' :f'{comparisons/iterations/n:.2f} n'
+            }))
+    df = pd.DataFrame(results).set_index(['n','algorithm'])
+    print(df)
+    print(df.to_latex(multirow = True, multicolumn_format = 'c'))
+
+\end{python}
 
 \end{document}

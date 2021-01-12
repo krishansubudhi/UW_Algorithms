@@ -122,7 +122,7 @@ E   &= \frac{6}{8} \ast 3 + \frac{2}{8} (E + 3)\\
 \end{align*} 
 
 
-Hence, $3$ bits will be used on an average to generate random bits from $1,....,6$ efficiently. 
+Hence, $4$ bits will be used on an average to generate random bits from $1,....,6$ efficiently. 
 
 \emph {Q: b)  Give a scheme to generate random numbers in the range 1, . . . , 9 that is as efficient as possible
 (in terms of the random bits). What is the expected number of bits you use?}
@@ -133,7 +133,7 @@ A: To generate a random number from $1, ..., 9$ we will need at least 4 random b
 
 Hence,
 \begin{align*}
-    E & = \frac{9}{16} \ast 3 + \frac{7}{16} (E+4)\\
+    E & = \frac{9}{16} \ast 4 + \frac{7}{16} (E+4)\\
     \implies 16E & = 36 + 7E + 28\\
     \implies E & = \frac{64}{9} = 7\dfrac{1}{9} 
 \end{align*}
@@ -142,10 +142,10 @@ We will use $7\dfrac{1}{9}$ expected number of bits.
 \newpage
 
 \exercise
-Partitions are the number of times a new pivot is selected. In other-words, partitions are the number of recursive operation run to find the median. 
+Partitions are the number of times a new pivot is selected. In other-words, partitions are the number of recursive operation done to find the median. 
 
 expected partitions = total partitions/iterations\\
-expected comparisons =total comparisons/iterations/n'\\
+expected comparisons =total comparisons/iterations/n\\
 Number of iterations per each row = 100
 
 \begin{table}[htbp]
@@ -188,12 +188,12 @@ n \\
 \bottomrule
 \end{tabular}
 \end{table}
-Note: I have used python's inbuilt sorting algorithm to select the pivot from median of 3 and median of 5. Since 3 and 5 are very small values, this table ignores the comparisons to select pivot and only considers comparisons while partitioning the list around the pivot. 
+Note: I have used python's inbuilt sorting algorithm to select the pivot for median of 3 and median of 5. Since 3 and 5 are very small values, this table ignores the comparisons to select pivot and only considers comparisons while partitioning the list around the pivot. 
 
 \subsection{Summary}
 \begin{itemize}
     \item The expected number of comparison is a constant multiple of the number of elements in the list.
-    \item Algorithms where the pivot is selected random has higher expected comparisons compared to the alorthms where pivot is calculated from median of 3 or 5. This is because the pivot has higher chance of being towards the middle in the later algorithms resulting in better average case.
+    \item Algorithms where the pivot is selected randomly has higher expected comparisons compared to the algorithms where pivot is calculated from median of 3 or 5. This is because the pivot has higher chance of being towards the middle in the later algorithms resulting in better average case.
     \item pivot selected Median of 5 outperforms pivot selected from median of 3. 
 \end{itemize}
 

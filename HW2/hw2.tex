@@ -1,0 +1,82 @@
+\documentclass{homeworg}
+
+\title{CSEP 521, Winter 2021: Homework 2}
+\author{Krishan Subudhi (ksubudhi@uw.edu) - 2040900}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{pythonhighlight}
+\usepackage{enumitem}
+\begin{document}
+
+\maketitle
+
+\exercise
+Office workers = $n$\\
+Desks = $n$
+
+Management assigns each worker to a random desk, without the requirement that only one person is assigned to a desk.
+
+\begin{align*}
+w_i &= \texttt{worker}_i \\
+d_j &= \texttt{desk}_j \\
+P(w_i, d_j) &= \frac{1}{n}
+\end{align*}
+
+\begin{enumerate}[label=\alph*)]
+    \item \emph{What is the expected number of people getting their original desk back?}
+    let $X_i$ be a random variable such that 
+    \[
+        X_i = \begin{cases}
+			1, & \text{person $i$ gets his/her desk back}\\
+            0, & \text{otherwise}
+		 \end{cases}
+    \]
+    \begin{align*}
+        & E(\text{number of people getting their original desk back}) \\
+        & = \sum_{i=1}^n E(\text{person $i$ gets his/her desk back }) \\
+        & = \sum_{i=1}^n E(X_i) \\
+        & = n \ast E(X_i) \\
+        & = n \ast (1 \ast P(w_i, d_i) + 0) \\
+        & = n \ast \frac{1}{n}\\
+        & = 1
+    \end{align*}
+    
+    \textbf{Expected number of people getting their original desk back = 1}
+    
+    \item \emph{What is the probability of having zero people assigned to a particular desk?}
+    
+    for a particular desk $d_j$,
+    \begin{align*}
+        & P(\text{zero people assigned to}\ d_j) \\
+        & = \prod_{i = 1}^{n} w_i \text{ not assigned to}\ d_j \\
+        & = \prod_{i = 1}^{n} 1- P(w_i, d_j)\\
+        & = \prod_{i = 1}^{n} 1-\frac{1}{n}\\
+        & = \begin{pmatrix}
+                \cfrac{n-1}{n}
+            \end{pmatrix}^n
+    \end{align*}
+    
+    \item \emph{What is the probability of having exactly one person assigned to a particular desk?}
+    
+    for a particular desk $d_j$,
+    \begin{align*}
+        & P(\text{exactly one person assigned}\ d_j) \\
+        & = \sum_{i = 1}^{n} \text{only } w_i \text{ is assigned to}\ d_j \qquad  \text{... \textit{events for each i are mutually exclusive}} \\
+        & = \sum_{i = 1}^{n} P(w_i, d_j) \prod_{k=1, k \ne j}^n (1- P(w_i, d_j))\\
+        & = \sum_{i = 1}^{n} \frac{1}{n} \ast 
+            \begin{pmatrix}
+                \cfrac{n-1}{n}
+            \end{pmatrix}^{n-1}\\
+        & = n 
+            \ast  \frac{1}{n} 
+            \ast 
+            \begin{pmatrix}
+                \cfrac{n-1}{n}
+            \end{pmatrix}^{n-1}\\
+        & = \begin{pmatrix}
+                \cfrac{n-1}{n}
+            \end{pmatrix}^{n-1}
+    \end{align*}
+\end{enumerate}
+
+\end{document}

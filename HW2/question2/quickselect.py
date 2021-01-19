@@ -109,11 +109,11 @@ if __name__ == '__main__':
     algos = [QuickSelect(), QuickSelectMiddleIndex(), QuickSelectMedianSort(), QuickSelectMedianQS()]
     iterations  =10
     results = []
-    for n in [1_000, 10_000, 100_000,1_000_000]:
+    for n in [1_000_000]:
         data = [i for i in range(1,n+1)]
         for q in algos:
             print(q)
-            random.seed(48)
+            random.seed(47)
             comparisons = 0
             partitions = 0
             start = time.time()
@@ -134,4 +134,4 @@ if __name__ == '__main__':
             }))
     df = pd.DataFrame(results).set_index(['n','algorithm'])
     print(df)
-    # print(df.to_latex(multirow = True, multicolumn_format = 'c'))
+    print(df.to_latex(multirow = True, multicolumn_format = 'c'))

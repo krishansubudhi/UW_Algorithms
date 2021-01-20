@@ -8,6 +8,12 @@
 \usepackage{pythonhighlight}
 \usepackage{enumitem}
 
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage{placeins}
+\let\Oldsubsection\subsection
+\renewcommand{\subsection}{\FloatBarrier\Oldsubsection}
+
 \begin{document}
 
 \maketitle
@@ -152,7 +158,7 @@ For selecting the median 3 algorithms were used.
 Note:
 The median selection algorithm was not the focus of the assignment. Hence comparisons done to find the median are not included in the result. But the run time includes time taken to select median at each stage. python inbuilt quick sort is faster because it's implemented in C. So even though it's $n (log n)$ run time at each stage, it's faster than my quick select algorithm which is written in pure python.
 
-The algorithm uses identity permutation as the data but is tested for non identity permutations as well and producing ma
+The algorithm uses identity permutation as the data but also tested for non identity permutations
 \begin{python}
 
 import random
@@ -287,5 +293,136 @@ if __name__ == '__main__':
     print(df)
     print(df.to_latex(multirow = True, multicolumn_format = 'c'))
 
+\end{python}
+
+\newpage
+\exercise
+\newpage
+\exercise
+There are n types of coupons.
+P(getting coupon i out of n) = $\frac{1}{n}$
+Each time you get a coupon, you are given a coupon of a random type (with equal probability of receiving each type of coupon).
+
+$X_k^n$ = number of coupons needed to get a new coupon when k coupons remain. \\
+Theoritical value = 
+
+\begin{equation}
+\label{X_kn}
+X_k^n = \frac{n}{k}
+\end{equation}
+
+$C_n$ = how many coupons you receive before you have completed the set. \\ 
+Theoritical value = 
+\begin{equation}
+\label{C_n}
+C_n = n \ast H_n = n \ln n +0.57n    
+\end{equation}
+
+\subsection{Results}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figure_1}
+    \caption{$E(X_k^n)$}
+    \label{fig:X_kn}
+\end{figure}
+
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Figure_2}
+    \caption{$E(C_n)$}
+    \label{fig:C_n}
+\end{figure}
+
+in figure \ref{fig:X_kn}, n is fixed at 10,1000. In 5 different iterations, $X_k^n$ is calculated by counting number of coupons collected before collecting a unique coupon while $k$ unique coupons were remaining. The experimental results math with the theoretical value (equation \ref{X_kn}) which is $\frac{n}{k}$.\\
+
+in figure \ref{fig:C_n} , in 5 different iterations, $C_n$ is calculated by counting total coupons received before completing the set. The range of n's used are $[100, 1000, 10000, 100000, 1000000]$. The experimental results match with the theoretical value (equation \ref{C_n}).
+
+\subsection{Source code}
+\begin{python}
+
+
+from collections import defaultdict
+import random, math
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+class CouponCollector():
+    def __init__(self,n):
+        self.n = n
+        self.k = n # remaining coupons to be collected
+        self.Xnk =  {}
+        self.Cn = 0
+        self.unique_coupons_collected = set()
+    def collect_all_coupons(self):
+        coupons_collected_this_iteration = 0
+        while self.k>0:
+            coupon = random.randint(1,self.n)
+            coupons_collected_this_iteration += 1
+            if coupon not in self.unique_coupons_collected:
+                #new coupon collected
+                self.unique_coupons_collected.add(coupon) # add to collected list
+                self.Xnk[self.k] = coupons_collected_this_iteration #update random variable value
+                self.k -= 1 # remaining 1 less
+                self.Cn += coupons_collected_this_iteration # total count
+                coupons_collected_this_iteration = 0 #reset
+    
+    def __str__(self):
+        return f'Cn = {self.Cn}, Xnk = {self.Xnk}'
+    @staticmethod
+    def theoritical_Xnk(n, k ):
+        return n/k
+    
+    @staticmethod
+    def theoritical_cn(n):
+        return n * math.log(n) + 0.57 * n
+
+def get_experimental_Cn_Xnk(n, iterations = 5):
+    Cns = []
+    Xnks = []
+    for iteration in range(iterations):
+        print('n, iteration', n, iteration)
+        collector = CouponCollector(n)
+        collector.collect_all_coupons()
+        Cns.append(collector.Cn)
+        Xnks.append(collector.Xnk)
+    #expectation
+    Cn = np.array(Cns).mean()
+    Xnk = pd.DataFrame(Xnks).mean()
+    return Cn, Xnk
+
+def get_theoritical_Cn_Xnk(n):
+    Xnk = {k: CouponCollector.theoritical_Xnk(n, k) for k in range( n,0,-1)}
+    Cn = CouponCollector.theoritical_cn(n)
+    return Cn, pd.Series(Xnk)
+
+# plot Xnk for n = 100,00
+n = 10000
+c, x = get_experimental_Cn_Xnk(n)
+plt.plot(x)
+c, x = get_theoritical_Cn_Xnk(n)
+plt.plot(x)
+plt.legend(['Experimental', 'Theory'])
+plt.xlabel('k')
+plt.ylabel('Xnk')
+plt.title(f'number of coupons needed to get a new coupon when k coupons remain (n = {n})')
+
+
+plt.figure()
+#plot Cn
+ns = [100, 1_000,100_00, 100_000, 1000_000]
+c_exp = [get_experimental_Cn_Xnk(n)[0] for n in ns]
+c_theo = [get_theoritical_Cn_Xnk(n)[0] for n in ns]
+
+plt.plot(ns,c_exp)
+plt.plot(ns,c_theo)
+plt.legend(['Experimental', 'Theory'])
+plt.xlabel('n')
+plt.ylabel('total coupons received')
+plt.title(f'coupons received before completing the set')
+
+
+plt.show()
 \end{python}
 \end{document}

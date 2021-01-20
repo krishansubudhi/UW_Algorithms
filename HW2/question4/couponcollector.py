@@ -54,10 +54,11 @@ class CouponCollector():
     def theoritical_cn(n):
         return n * math.log(n) + 0.57 * n
 
-def get_experimental_Cn_Xnk(n, iterations = 10):
+def get_experimental_Cn_Xnk(n, iterations = 5):
     Cns = []
     Xnks = []
     for iteration in range(iterations):
+        print('n, iteration', n, iteration)
         collector = CouponCollector(n)
         collector.collect_all_coupons()
         Cns.append(collector.Cn)
@@ -72,7 +73,7 @@ def get_theoritical_Cn_Xnk(n):
     Cn = CouponCollector.theoritical_cn(n)
     return Cn, pd.Series(Xnk)
 
-#plot Xnk for n = 100,000
+# plot Xnk for n = 100,000
 n = 10000
 c, x = get_experimental_Cn_Xnk(n)
 plt.plot(x)
@@ -86,7 +87,7 @@ plt.title(f'number of coupons needed to get a new coupon when k coupons remain (
 
 plt.figure()
 #plot Cn
-ns = [10,100,1000]
+ns = [100, 1_000,100_00, 100_000, 1000_000]
 c_exp = [get_experimental_Cn_Xnk(n)[0] for n in ns]
 c_theo = [get_theoritical_Cn_Xnk(n)[0] for n in ns]
 
@@ -95,7 +96,7 @@ plt.plot(ns,c_theo)
 plt.legend(['Experimental', 'Theory'])
 plt.xlabel('n')
 plt.ylabel('total coupons received')
-plt.title(f'how many coupons you receive before you have completed the set')
+plt.title(f'coupons received before completing the set')
 
 
 plt.show()

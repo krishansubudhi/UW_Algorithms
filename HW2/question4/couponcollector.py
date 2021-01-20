@@ -74,7 +74,7 @@ def get_theoritical_Cn_Xnk(n):
     return Cn, pd.Series(Xnk)
 
 # plot Xnk for n = 100,000
-n = 10000
+n = 100000
 c, x = get_experimental_Cn_Xnk(n)
 plt.plot(x)
 c, x = get_theoritical_Cn_Xnk(n)
@@ -85,18 +85,18 @@ plt.ylabel('Xnk')
 plt.title(f'number of coupons needed to get a new coupon when k coupons remain (n = {n})')
 
 
-plt.figure()
-#plot Cn
-ns = [100, 1_000,100_00, 100_000, 1000_000]
-c_exp = [get_experimental_Cn_Xnk(n)[0] for n in ns]
-c_theo = [get_theoritical_Cn_Xnk(n)[0] for n in ns]
+# plt.figure()
+# #plot Cn
+# ns = [100, 1_000,100_00, 100_000, 1000_000]
+# c_exp = [get_experimental_Cn_Xnk(n)[0] for n in ns]
+# c_theo = [get_theoritical_Cn_Xnk(n)[0] for n in ns]
 
-plt.plot(ns,c_exp)
-plt.plot(ns,c_theo)
-plt.legend(['Experimental', 'Theory'])
-plt.xlabel('n')
-plt.ylabel('total coupons received')
-plt.title(f'coupons received before completing the set')
+# plt.plot(ns,c_exp)
+# plt.plot(ns,c_theo)
+# plt.legend(['Experimental', 'Theory'])
+# plt.xlabel('n')
+# plt.ylabel('total coupons received')
+# plt.title(f'coupons received before completing the set')
 
 
 plt.show()

@@ -19,15 +19,15 @@
 \maketitle
 
 \exercise
-Office workers = $n$\\
-Desks = $n$
+Number of Office workers = $n$\\
+Total desks = $n$
 
 Management assigns each worker to a random desk, without the requirement that only one person is assigned to a desk.
 
 \begin{align*}
 w_i &= \texttt{worker}_i \\
 d_j &= \texttt{desk}_j \\
-P(w_i, d_j) &= \frac{1}{n}
+P(w_i, d_j) &= \frac{1}{n} \quad \text{ ... probability that $w_i$ is assigned to $d_j$}
 \end{align*}
 
 \begin{enumerate}[label=\alph*)]
@@ -41,8 +41,8 @@ P(w_i, d_j) &= \frac{1}{n}
     \]
     \begin{align*}
         & E(\text{number of people getting their original desk back}) \\
-        & = \sum_{i=1}^n E(\text{person $i$ gets his/her desk back }) \\
-        & = \sum_{i=1}^n E(X_i) \\
+        & = E(\sum_{i=1}^n X_i) \\
+        & = \sum_{i=1}^n E(X_i) \quad \text{ ... linearity of expectation}\\ 
         & = n \ast E(X_i) \\
         & = n \ast (1 \ast P(w_i, d_i) + 0) \\
         & = n \ast \frac{1}{n}\\
@@ -56,9 +56,9 @@ P(w_i, d_j) &= \frac{1}{n}
     for a particular desk $d_j$,
     \begin{align*}
         & P(\text{zero people assigned to}\ d_j) \\
-        & = \prod_{i = 1}^{n} w_i \text{ not assigned to}\ d_j \\
+        & = \prod_{i = 1}^{n} P(w_i \text{ not assigned to}\ d_j) \\
         & = \prod_{i = 1}^{n} 1- P(w_i, d_j)\\
-        & = \prod_{i = 1}^{n} 1-\frac{1}{n}\\
+        & = \prod_{i = 1}^{n} \left(1-\frac{1}{n}\right)\\
         & = \begin{pmatrix}
                 \cfrac{n-1}{n}
             \end{pmatrix}^n
@@ -69,7 +69,7 @@ P(w_i, d_j) &= \frac{1}{n}
     for a particular desk $d_j$,
     \begin{align*}
         & P(\text{exactly one person assigned}\ d_j) \\
-        & = \sum_{i = 1}^{n} \text{only } w_i \text{ is assigned to}\ d_j \qquad  \text{... \textit{events for each i are mutually exclusive}} \\
+        & = \sum_{i = 1}^{n} P(\text{only } w_i \text{ is assigned to}\ d_j) \qquad  \text{... \textit{events for each i are mutually exclusive}} \\
         & = \sum_{i = 1}^{n} P(w_i, d_j) \prod_{k=1, k \ne j}^n (1- P(w_i, d_j))\\
         & = \sum_{i = 1}^{n} \frac{1}{n} \ast 
             \begin{pmatrix}
@@ -85,12 +85,12 @@ P(w_i, d_j) &= \frac{1}{n}
                 \cfrac{n-1}{n}
             \end{pmatrix}^{n-1}
     \end{align*}
-    
+ 
     \item What happens to the probabilities from parts b and c and n gets large?
     
     \textbf{part b}
     \begin{align*}
-        & \lim_{n \to \infty} \left( \frac{n-1}{n} \right)^n \\
+        P = & \lim_{n \to \infty} \left( \frac{n-1}{n} \right)^n \\
         =& \lim_{n \to \infty} \left( 1 -  \frac{1}{n} \right)^n \\
         =& \ \frac{1}{e} \label{eq}
     \end{align*}
@@ -104,6 +104,18 @@ P(w_i, d_j) &= \frac{1}{n}
         =& \ \frac{1}{e} \ast 1 \\
         =&\ \frac{1}{e}
     \end{align*}
+    
+    \item \emph{Q. What is the probability that no two people are assigned to the same desk?}
+    
+    Since there are only n desks for n people, each person gets one unique desk.
+    
+    Number of ways everyone can get a unique desk = $n!$
+    
+    Total number of ways everyone can get a desk = $n^n$
+    \begin{align*}
+    P = \frac{n!}{n^n}
+    \end{align*}
+    
 \end{enumerate}
 \newpage
 
@@ -112,6 +124,14 @@ P(w_i, d_j) &= \frac{1}{n}
 find the maximum element.}
 
 For this problem, I am selecting the median during each pivot selection step. Using that median as pivot, quick select is applied to find the max element.
+
+3 algorithms were used for median selection. 
+\begin{enumerate}
+    \item select the middle index (only works for identity permutation)
+    \item Python inbuilt sort (mix of merge and selection sort) and then select the middle element.
+    \item find median using quick select with random pivot
+\end{enumerate}
+
 
 \begin{table}[htbp]
 \label{q2:result}
@@ -146,14 +166,7 @@ For this problem, I am selecting the median during each pivot selection step. Us
 
 \end{table}
 
-if the pivot is always the median (last 3 rows for each n), then the selection algorithm makes (about) $2n$ comparisons. If the pivot is selected at random (first row for each n) the number of comparisons are more than $2n$
-
-For selecting the median 3 algorithms were used. 
-\begin{enumerate}
-    \item select the middle index (only works for identity permutation)
-    \item Python inbuilt sort (mix of merge and selection sort)
-    \item quick select with random pivot
-\end{enumerate}
+if the pivot is always the median (last 3 rows for each n), then the selection algorithm makes (about) $2n$ comparisons. 
 
 Note:
 The median selection algorithm was not the focus of the assignment. Hence comparisons done to find the median are not included in the result. But the run time includes time taken to select median at each stage. python inbuilt quick sort is faster because it's implemented in C. So even though it's $n (log n)$ run time at each stage, it's faster than my quick select algorithm which is written in pure python.
@@ -302,7 +315,7 @@ given an undirected graph $G =(V,E)$ with distinguished vertices s and t, \\
 find a partition of the vertices $(S,T)$ (where $S \cup T = V$ and $S \cap T = \emptyset$) \\
 with $s \in S$ and $t \in T$ which minimizes the number of edges between S and T.
 
-\emph{Q. Show that Karger’s algorithm does not work for the S }
+\emph{Q. Show that Karger’s algorithm does not work for the $S$ -$T$ mincut problem }
 
 \begin{figure}[h]
     \centering
@@ -311,7 +324,7 @@ with $s \in S$ and $t \in T$ which minimizes the number of edges between S and T
     \label{fig:ST}
 \end{figure}
 
-Let's consider this family of graphs where there are two nodes $s$, $t$ and $n$ other nodes which have edges with both $s$ and $t$ node. Each node has two edges with $s$ and only one edge with $t$.
+Let's consider this family of graphs similar to \ref{fig:ST} where there are two anchor nodes $s$ and $t$. There are $n$ other nodes which have edges with both $s$ and $t$ node. Each node has two edges with $s$ and only one edge with $t$.
 
 Total number of vertices = $n+2$\\
 Total number of edges = $n + 2n = 3n$\\
@@ -321,12 +334,16 @@ If Krager's algorithm is applied to this family of graphs, \\
 P(success) = P(\text{not having any mincut edges contracted by the random contraction process}) 
 \]
 \[
-P (\text{mincut edge is contracted at step 1}) = \frac{n}{3n}\\
+P (\text{mincut edge is contracted in the first step}) = \frac{n}{3n}
 \]
-At each step 2 non-mincut edges need be contracted for success.
-\[
-P (\text{mincut edge is not contracted at step $i$ | no mincut edge was contracted from step $0$ to $i-1$}) = \frac{2n-2i}{3n-2i}
-\]
+For simplicity let's start the steps from 0.
+
+At each step,  2 non-mincut edges need be contracted for success.
+
+\begin{multline*}
+P (\text{ mincut edge is not contracted at step $i$ } |\\
+\text{ no mincut edge was contracted from step $0$ to $i-1$} ) = \frac{2n-2i}{3n-2i}
+\end{multline*}
 \begin{align*}
     P(success) &= \prod_{i=0}^{n-1} \frac{2n-2i}{3n-2i} \quad \text{... since i starts from 0, it will end at n-1}\\
     & \leq \prod_{i=n/2}^{n-1} \frac{2n-2i}{3n-2i} \quad \text{... since each term in the product was less than 1}\\
@@ -336,7 +353,7 @@ P (\text{mincut edge is not contracted at step $i$ | no mincut edge was contract
     & \leq 2 \left(\frac{1}{\surd{2}}\right)^n
 \end{align*}
 
-Since $P(success)$ is exponentially small wrt $n$, Krager's algorithm will fail here as we will need exponentially many such runs for this algorithm to succeed with high probability.
+Since $\frac{1}{\surd{2}} < 1$, $P(success)$ will be exponentially small wrt $n$, Krager's algorithm will fail here as we will need exponentially many such runs for this algorithm to succeed with high probability.
 
 \newpage
 
@@ -344,10 +361,12 @@ Since $P(success)$ is exponentially small wrt $n$, Krager's algorithm will fail 
 
 \exercise
 There are n types of coupons.
+
 P(getting coupon i out of n) = $\frac{1}{n}$
+
 Each time you get a coupon, you are given a coupon of a random type (with equal probability of receiving each type of coupon).
 
-$X_k^n$ = number of coupons needed to get a new coupon when k coupons remain. \\
+Let $X_k^n$ = number of coupons needed to get a new coupon when k coupons remain. \\
 Theoritical value = 
 
 \begin{equation}
@@ -355,7 +374,7 @@ Theoritical value =
 X_k^n = \frac{n}{k}
 \end{equation}
 
-$C_n$ = how many coupons you receive before you have completed the set. \\ 
+Let $C_n$ = how many coupons you receive before you have completed the set. \\ 
 Theoritical value = 
 \begin{equation}
 \label{C_n}
@@ -363,15 +382,6 @@ C_n = n \ast H_n = n \ln n +0.57n
 \end{equation}
 
 \subsection{Results}
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.6\textwidth]{Figure_1}
-    \includegraphics[width=0.6\textwidth]{Figure_3}
-    \caption{$E(X_k^n)$ for different n}
-    \label{fig:X_kn}
-\end{figure}
-
-
 
 \begin{figure}[h]
     \centering
@@ -380,9 +390,19 @@ C_n = n \ast H_n = n \ln n +0.57n
     \label{fig:C_n}
 \end{figure}
 
-in figure \ref{fig:X_kn}, n is fixed at 10,1000. In 5 different iterations, $X_k^n$ is calculated by counting number of coupons collected before collecting a unique coupon while $k$ unique coupons were remaining. The experimental results math with the theoretical value (equation \ref{X_kn}) which is $\frac{n}{k}$.\\
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Figure_1}
+    \includegraphics[width=0.8\textwidth]{Figure_3}
+    \caption{$E(X_k^n)$ for different n}
+    \label{fig:X_kn}
+\end{figure}
 
-in figure \ref{fig:C_n} , in 5 different iterations, $C_n$ is calculated by counting total coupons received before completing the set. The range of n's used are $[100, 1000, 10000, 100000, 1000000]$. The experimental results match with the theoretical value (equation \ref{C_n}).
+
+
+For figure \ref{fig:C_n} , in 5 different iterations, $C_n$ is calculated by counting total coupons received before completing the set. The range of n's used are $[100, 1000, 10000, 100000, 1000000]$. The experimental results match with the theoretical value (equation \ref{C_n}).
+
+To plot figure \ref{fig:X_kn}, The range of n's used are $[ 10000, 100000]$. In 5 different iterations, $X_k^n$ is calculated by counting number of coupons collected before collecting a unique coupon while $k$ unique coupons were remaining. The experimental results match with the theoretical value (equation \ref{X_kn}) which is $\frac{n}{k}$.\\
 
 \subsection{Source code}
 \begin{python}

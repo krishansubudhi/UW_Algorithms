@@ -46,31 +46,49 @@ import dataclasses
 
 
 @dataclasses.dataclass
-class Man:
+class Person:
     index: int
     pref_list: list
     current_match: int = -1  # accepted
-    total_proposed: int = -1  # may or may not be accepted
+
+class Man(Person):
+    total_proposed: int = 0  # may or may not be accepted
     def get_next_woman(self):
-        return self.pref_list[self.total_proposed + 1]
+        return self.pref_list[self.total_proposed]
+    @property
+    def mrank(self):
+        return self.total_proposed
 
 
-class Woman(Man):
+class Woman(Person):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.pref_dict = {m: i for i, m in enumerate(self.pref_list)}
+        del self.pref_list
     def __str__(self):
         return super().__str__() + str(self.pref_dict)
     def __repr__(self):
         return super().__repr__() + str(self.pref_dict)
+    @property
+    def wrank(self):
+        return self.pref_dict[self.current_match]
 
 
 class GayleShapely:
-    def __init__(self, men: list, women: list, trace=True):
-        self.men = men
-        self.women = women
-        self.free_men = set([m.index for m in self.men])
+    def __init__(self, m: list, w: list, trace=True):
+
+        m = np.array(m)
+        w = np.array(w)
+        self.men = [Man(i, pref) for i, pref in enumerate(m)]
+        self.women = [Woman(i, pref) for i, pref in enumerate(w)]
         self.trace = trace
+        
+        self.free_men = set([m.index for m in self.men])
+        if trace:
+            print('men')
+            print(m)
+            print('women')
+            print(w)
 
     def _get_next_free_m(self):
         return self.men[self.free_men.pop()] if len(self.free_men) >0 else None
@@ -116,11 +134,43 @@ class GayleShapely:
                 # _propose
                 accepted = self._propose(m, w)
             m = self._get_next_free_m()
-        print(self.get_matches())
+        if self.trace:
+            print('matches\n',self.get_matches())
 
     def get_matches(self):
         return [m.current_match for m in self.men]
 
+    def get_mranks(self):
+        return [m.mrank for m in self.men]
+    
+    
+    def get_wranks(self):
+        return [w.wrank for w in self.women]
+
+    @property
+    def MGoodness(self):
+        return sum(self.get_mranks())/len(self.men)
+    
+    @property
+    def WGoodness(self):
+        return sum(self.get_wranks())/len(self.women)
+
+def main():
+    m = [
+        [2,1,3,0],
+        [0,1,3,2],
+        [0,1,2,3],
+        [0,1,2,3]
+    ]
+
+    w = [
+        [0,2,1,3],
+        [2,0,3,1],
+        [3,2,1,0],
+        [2,3,1,0]
+    ]
+    algo = GayleShapely(m,w)
+    algo.match()
 
 if __name__ == "__main__":
     # m = [[2, 0, 1], [2, 0, 1], [2, 1, 0]]
@@ -140,14 +190,11 @@ if __name__ == "__main__":
             [0, 1, 3, 2],
             [3, 0, 2, 1]
         ]
-
-    print()
-    print(m)
-    print(w)
-
-    men = [Man(i, pref) for i, pref in enumerate(m)]
-    women = [Woman(i, pref) for i, pref in enumerate(w)]
-
-    algo = GayleShapely(men, women)
+    algo = GayleShapely(m, w, trace = False)
 
     algo.match()
+
+    assert algo.get_matches() == [3, 1, 2, 0]
+    main()
+
+    #assignment

@@ -149,19 +149,28 @@ import time
 import pandas as pd
 def main2():
     results = {}
-    for n in [1_000_000]:
-        random.seed(46)
-        algo = GayleShapelyRandom(n, trace = False)
-        start = time.time()
-        algo.match()
-        end = time.time()
-        
-        total_time = end-start
+    random.seed(47)
+    for n in [1_000_000]:#[1_000, 10_000, 100_000]:
+        print(f'n =  {n}')
+        total_time = 0
+        MGoodness = 0
+        WGoodness = 0
+        iterations = 2
+        for i in range(iterations):
+            print(f'iteration {i+1}')
+            algo = GayleShapelyRandom(n, trace = False)
+            start = time.time()
+            algo.match()
+            end = time.time()
+            
+            total_time += (end-start)
+            MGoodness += algo.MGoodness
+            WGoodness += algo.WGoodness
         
         results[n]= pd.Series({
-                'time_s':total_time,
-                'MGoodness':algo.MGoodness,
-                'WGoodness':algo.WGoodness
+                'time_s':total_time/iterations,
+                'MGoodness':MGoodness/iterations,
+                'WGoodness':WGoodness/iterations
             })
     df =  pd.DataFrame(results).T
     print(df)

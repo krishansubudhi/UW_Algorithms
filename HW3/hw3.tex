@@ -1,0 +1,42 @@
+\documentclass{homeworg}
+
+\title{CSEP 521, Winter 2021: Homework 3}
+\author{Krishan Subudhi (ksubudhi@uw.edu) - 2040900}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{pythonhighlight}
+\usepackage{enumitem}
+
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage{placeins}
+\let\Oldsubsection\subsection
+\renewcommand{\subsection}{\FloatBarrier\Oldsubsection}
+
+\begin{document}
+
+\maketitle
+
+\exercise
+Unique keys possible with 128 bits = d
+\begin{align*}
+d &=  2^{128}\\
+p &= 1\% =0.01\\
+n(p;d) &= \sqrt{2d \ln{\frac{1}{1-p}}}\\
+& = \sqrt{2 \ast 2^{128} \ln{\frac{1}{1-0.01}}}
+\end{align*}
+Here $n$ is the number of keys that need to be generated until there is a $1\%$ probability that two keys are same. 
+
+$n$ is the number of transactions. 1 billion users are generating 1 thousand transactions per day. Hence the user can record data until $n/1E9/1000/365$ years.
+
+\begin{python}
+n/1E9/1000/365 = math.sqrt(math.pow (2,129) * math.log(1/0.99))/1E12/365
+\end{python}
+ = $7165.263$ years
+ 
+Hence the user can record data until 7165 years until there is 1\% chance of having two transactions with the same key.
+\newpage
+
+\exercise
+\end{document}

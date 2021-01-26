@@ -29,9 +29,17 @@ for n = 15000 I got memory error since my laptop ran out of memory as it require
 
 ## Question 6
              time_s  MGoodness      WGoodness
-15000      0.470326   8.782333   13298.236067
+1000    0.015626    6.11800    836.72500
+10000   0.347475    7.68000   8674.94450
+100000  6.250381   10.35613  90388.15315
 1000000  267.126089  14.845793  932650.559885
 
+
+            time_s  MGoodness    WGoodness
+    1000     0.043646   7.026200    861.77640
+    10000    0.602480  11.491620   9087.75528
+    100000  14.337444  11.838222  91496.48217
+    1000000 380.481416  13.926717  928043.49204
 
 Write a summary of your results for large n, including both the statistics for rank/goodness, as well as recorded run-time of the program. 
 

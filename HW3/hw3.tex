@@ -39,4 +39,47 @@ Hence the user can record data until 7165 years until there is 1\% chance of hav
 \newpage
 
 \exercise
+\begin{enumerate}[label=\alph*)]
+\item 
+$m$ is ranked first on $w$'s preference list.\\
+$w$ is ranked first on $m$'s preference list.
+
+We have to prove that for every stable matching for $I(M,W)$, $(m,w)$ must be the matching.
+
+Let's prove this through contradiction. Let's assume that in one of the stable matching instances $S$, $m$ is matched with $w'$  and $w$ is matched with $m'$.
+
+However, since $m$ prefers $w$ over $w'$ and $w$ prefers $m$ over $m'$, $(m,w')$ , $(m',w)$ is an instability.
+
+This contradicts our claim that $S$ is stable and hence proves that every stable matching instance must match $m$ with $w$.
+
+\item In stable matching problem $I =(M,W)$ ,\\
+Preference list of all $m \in M$ is $[w_1,w_2,. .., w_n]$
+
+
+For a particular $I$, preference list is fixed for for every $m \in M$ and every woman $w \in W$ 
+
+We have to prove that \emph{There is a unique solution to this instance}
+
+Let's say in the stable matching problem $I$, $w_1$ prefers $m_i$ over $m_j$
+
+Let assume that there are two stable matching possible for instance $I$ - $S$ and $S'$.  In $S$, $w_1$ is matched with $m_i$ and in $S'$ $w_1$ is matched with $m_j$.
+
+For $w', w'' \in [w_2,w_3,. .., w_n]$
+\begin{align*}
+    S : (m_i,w_1),(m_j,w')\\
+    S' : (m_j,w_1),(m_i,w'')\\
+\end{align*}
+
+Since $w_1$ prefers $m_i$ over over $m_j$, and $m_i$  prefers $w_1$ over $w'$ and $w''$, $S'$ will not be stable match - contradicting our initial assumption. Hence the only match possible for $w_1$ is $(w_1,m_i)$.
+
+Now since $(w_1,m_i)$ is the only stable match possible for $w_1$ and $m_i$, we can remove $w_1$ and $m_i$ from the preference lists and match others. After removing  $w_1$, the preference list for men becomes $[w_2,. .., w_n]$. Applying the same logic as above, we can prove that there is an unique stable match for $w_2$ too. hence it can be proven by induction that each $w_i$ will have an a unique stable match. Since each $w_i$ has a unique stable match, there is only one unique stable solution possible for $I$.
+
+\end{enumerate}
+
+\newpage
+
+\exercise
+\emph{Q: Show that a participant can improve its outcome by lying about its preferences.}
+
+In Gale-Shapley algorithm, women can imrpove their chances of achieving a better match if they switch the order of their preferences in some cases.
 \end{document}

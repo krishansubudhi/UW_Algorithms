@@ -81,5 +81,37 @@ Now since $(w_1,m_i)$ is the only stable match possible for $w_1$ and $m_i$, we 
 \exercise
 \emph{Q: Show that a participant can improve its outcome by lying about its preferences.}
 
-In Gale-Shapley algorithm, women can imrpove their chances of achieving a better match if they switch the order of their preferences in some cases.
+In Gale-Shapley algorithm, women can imrpove their chances of achieving a better match if they switch the order of their preferences in some cases. Let's say the preference for women is in the following order:
+
+\begin{align*}
+    w &: [m'' , m , m']\\
+    w'&: [m, m'', m']\\
+    w''&:[m, m'', m']\\
+\end{align*}
+Let's say preference list of men is
+\begin{align*}
+    m &: [w , w' , w'']\\
+    m'&:[w , w' , w'']\\
+    m''&: [w', w, w'']
+\end{align*}
+
+If we run the Gale-Shapley on the preference lists above, we obtain the final match to be $m-w, m''-w', m'-w''$
+
+In this case $m$ is higher in preference list of other women. But since $w$ is first preference of $m$, and $m$ proposes first in Gayle Shapely algorithm, $w$  will accept $m$'s proposal and $w'$ will accept $m''$'s proposal. The algorithm still produces stable match even though $w$ does not get her first preference. 
+
+Now let's say $w$ lies about her preference. 
+
+\begin{align*}
+    w &: [m'' , m' , m]\\
+    w'&: [m, m'', m']\\
+    w''&:[m, m'', m']\\
+\end{align*}
+
+If we run the Gale-Shapley on the updated preference list of women if $w$ lies, we obtain the match to be $m-w', m''-w, m'-w''$, noticing that w1 ends up with her first preference.
+
+Hence $w$ was matched $m''$ which she prefers higher than both $m$ and $m'$. This proves that lying about preference can increase the chances to get a better match. 
+\newpage
+
+\exercise
+
 \end{document}

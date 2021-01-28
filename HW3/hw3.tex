@@ -21,9 +21,8 @@
 \maketitle
 
 \exercise
-Unique keys possible with 128 bits = d
+Unique keys possible with 128 bits = d =  $2^{128}$
 \begin{align*}
-d &=  2^{128}\\
 p &= 1\% =0.01\\
 n(p;d) &= \sqrt{2d \ln{\frac{1}{1-p}}}\\
 & = \sqrt{2 \ast 2^{128} \ln{\frac{1}{1-0.01}}}
@@ -37,7 +36,7 @@ n/1E9/1000/365 = math.sqrt(math.pow (2,129) * math.log(1/0.99))/1E12/365
 \end{python}
  = $7165.263$ years
  
-Hence the user can record data until 7165 years until there is 1\% chance of having two transactions with the same key.
+Hence Mark can record data until 7165 years until there is 1\% chance of having two transactions with the same key.
 \newpage
 
 \exercise
@@ -54,25 +53,34 @@ However, since $m$ prefers $w$ over $w'$ and $w$ prefers $m$ over $m'$, $(m,w')$
 
 This contradicts our claim that $S$ is stable and hence proves that every stable matching instance must match $m$ with $w$.
 
-\item In stable matching problem $I =(M,W)$ ,\\
-Preference list of all $m \in M$ is $[w_1,w_2,. .., w_n]$
+\item In the given instance of stable matching problem $I =(M,W)$ ,
 
+\begin{equation}
+\label{eq:2_men}
+\text{Preference list of all } m \in M \text{ is } [w_1,w_2,. .., w_n]
+\end{equation}
 
 For a particular $I$, preference list is fixed for for every $m \in M$ and every woman $w \in W$ 
 
 We have to prove that \emph{There is a unique solution to this instance}
 
-Let's say in the stable matching problem $I$, $w_1$ prefers $m_i$ over $m_j$
+Let's say in the stable matching problem $I$ for any random $0 <i, j <n$, 
+\begin{equation}
+\label{eq:2_women}
+w_1\ \text{prefers}\ m_i\ \text{over}\ m_j
+\end{equation}
+
+
 
 Let assume that there are two stable matching possible for instance $I$ - $S$ and $S'$.  In $S$, $w_1$ is matched with $m_i$ and in $S'$ $w_1$ is matched with $m_j$.
 
 For $w', w'' \in [w_2,w_3,. .., w_n]$
 \begin{align*}
-    S : (m_i,w_1),(m_j,w')\\
-    S' : (m_j,w_1),(m_i,w'')\\
+    S : (m_i,w_1),(m_j,w') ..\\
+    S' : (m_j,w_1),(m_i,w'') ..\\
 \end{align*}
 
-Since $w_1$ prefers $m_i$ over over $m_j$, and $m_i$  prefers $w_1$ over $w'$ and $w''$, $S'$ will not be stable match - contradicting our initial assumption. Hence the only match possible for $w_1$ is $(w_1,m_i)$.
+Since $w_1$ prefers $m_i$ over over $m_j$ ( as per \ref{eq:2_women}), and $m_i$  prefers $w_1$ over $w'$ and $w''$ ( as per \ref{eq:2_men}), $S'$ will not be stable match - contradicting our initial assumption. Hence the only match possible for $w_1$ is $(w_1,m_i)$.
 
 Now since $(w_1,m_i)$ is the only stable match possible for $w_1$ and $m_i$, we can remove $w_1$ and $m_i$ from the preference lists and match others. After removing  $w_1$, the preference list for men becomes $[w_2,. .., w_n]$. Applying the same logic as above, we can prove that there is an unique stable match for $w_2$ too. hence it can be proven by induction that each $w_i$ will have an a unique stable match. Since each $w_i$ has a unique stable match, there is only one unique stable solution possible for $I$.
 
@@ -83,7 +91,7 @@ Now since $(w_1,m_i)$ is the only stable match possible for $w_1$ and $m_i$, we 
 \exercise
 \emph{Q: Show that a participant can improve its outcome by lying about its preferences.}
 
-In Gale-Shapley algorithm, women can imrpove their chances of achieving a better match if they switch the order of their preferences in some cases. Let's say the preference for women is in the following order:
+In Gale-Shapley algorithm, participants can imrpove their chances of achieving a better match if they switch the order of their preferences in some cases. Let's say the preference for women is in the following order:
 
 \begin{align*}
     w &: [m'' , m , m']\\
@@ -99,7 +107,7 @@ Let's say preference list of men is
 
 If we run the Gale-Shapley on the preference lists above, we obtain the final match to be $m-w, m''-w', m'-w''$
 
-In this case $m$ is higher in preference list of other women. But since $w$ is first preference of $m$, and $m$ proposes first in Gayle Shapely algorithm, $w$  will accept $m$'s proposal and $w'$ will accept $m''$'s proposal. The algorithm still produces stable match even though $w$ does not get her first preference. 
+In this case $m$ is higher in preference list of  women other than $w$. But since $w$ is first preference of $m$, and $m$ proposes first in Gayle Shapely algorithm, $w$  will accept $m$'s proposal and $w'$ will accept $m''$'s proposal. The algorithm still produces stable match even though $w$ does not get her first preference. 
 
 Now let's say $w$ lies about her preference. 
 
@@ -109,7 +117,7 @@ Now let's say $w$ lies about her preference.
     w''&:[m, m'', m']\\
 \end{align*}
 
-If we run the Gale-Shapley on the updated preference list of women if $w$ lies, we obtain the match to be $m-w', m''-w, m'-w''$, noticing that w1 ends up with her first preference.
+If we run the Gale-Shapley on the updated preference list of women, we obtain the match to be $m-w', m''-w, m'-w''$, noticing that w1 ends up with her first preference.
 
 Hence $w$ was matched $m''$ which she prefers higher than both $m$ and $m'$. This proves that lying about preference can increase the chances to get a better match. 
 \newpage
@@ -117,7 +125,7 @@ Hence $w$ was matched $m''$ which she prefers higher than both $m$ and $m'$. Thi
 \exercise
 \emph{Q) Implement the stable matching algorithm.}
 
-Here I have implemented the Gayle Shapely algorithm. Men propose to women and women accept the proposal if they are unmatched or the proposal is preferred compared to the current match. The specific implementation uses a set of unmatched men.
+Here I have implemented the Gayle Shapely algorithm. Men propose to women and women accept the proposal if they are either unmatched or the proposal is preferred compared to the current match. The specific implementation uses a set of unmatched men.
 \begin{verbatim}
 
 men
@@ -372,7 +380,7 @@ n    &              &            &            &                              &  
 \begin{enumerate}
     \item Q. how does the goodness change for M and W?
 
-MGoodness grows at the rate of $O(logn)$ while WGoodness grows at a rate less than $O(n)$. The growth rates might not be exact but the constant ratio gives an indication of the upper bound. Clearly the algorithm is not favourable for women.
+MGoodness grows at the rate of $O(logn)$ while WGoodness grows at a rate around $O(n)$. The growth rates might not be exact but the constant ratio gives an indication of the upper bound. Clearly the algorithm is not favourable for women.
 
     \item Q. How does the run time of the code vary as a function of n?\\
 
@@ -382,7 +390,7 @@ Run time grows approximately at a rate of $O(n log n )$
 
 The ratio of runtime and Coupon Collector theoritical value is almost a constant at every n. Approximately the growth rates seem to match. 
 
-Note: the constant values are slightly higher for higher $n$. But there can be other constraints like ineffecient memory management, processor throttling which might increase runtime at higher $n$. But the overall constant ratio makes this algorithm runtime comparable with coupon collector. 
+Note: the constant values for growth rates wrt time are slightly higher for higher $n$. But there can be other constraints like ineffecient memory management, processor throttling which might increase runtime at higher $n$. But the overall constant ratio makes this algorithm runtime comparable with coupon collector. 
 \end{enumerate}
 
 \newpage
@@ -588,13 +596,13 @@ n       &             &            &                &                 &         
 
 \emph{Q. What does the estimated growth rate in runtime}
 
-All results are averaged over 5 iterations. Growth rate of MGoodness is $O(logn)$ and growth of Wgoodness is $O(n)$. Runtime is higher than  $O(nlogn)$ but lower than $O(n^2)$. Run time is calculated as system time and can involve CPU throttling and memory inefficiency at higher n too.
+All results are averaged over 5 iterations. Growth rate of MGoodness is $O(logn)$ and growth of Wgoodness is $O(n)$. Runtime is higher than  $O(nlogn)$ but lower than $O(n^2)$. Run time is calculated as system time and can involve CPU throttling and memory inefficiency at higher n too. Random preference creation is also part of runtime which might be contributing to higher than $nlogn$ run time. 
 
-\emph{!. In your write up describe your process for incrementally generating random permutations.}
+\emph{Q. In your write up describe your process for incrementally generating random permutations.}
 
 Instead of creating all the random permutations beforehand which required $O(n^2)$ memory, the permutations are generated incrementally.
 
-When a particular man $m$ had to propose a new woman, the woman $w$ was selected randomly from the set of all women to which $m$ had never proposed previously. Each men only stored information of women they had previously proposed. Since $m$s propose $log n$ women on average, the space requirement reduced to $O(n logn)$. 
+When a particular man $m$ had to propose a new woman, the woman $w$ was selected randomly from the set of all women to which $m$ had never proposed previously. Each men only stored information of women they had previously proposed. Since each $m$ proposes $log n$ women on average, the space requirement reduced to $O(n logn)$. 
 
 Similarly, for a woman $w$, only ranks of those men were stored which had already proposed her. When a new man proposed, his rank was selected randomly from a set of all possible ranks minus the ranks of men who had previously proposed $w$.  Since each $m$ proposes $log n$ women on average, each woman was proposed $log n$ times on average too. The space requirement for women also reduced to $O(n logn)$. 
 

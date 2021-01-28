@@ -1,3 +1,5 @@
+# Question 4
+
 # Question 5
 n   time_micros  MGoodness  WGoodness  time_ms/CouponCollector
 100        0.00   5.340000    16.8400                 0.000000

@@ -7,10 +7,12 @@
 \usepackage{multirow}
 \usepackage{pythonhighlight}
 \usepackage{enumitem}
+\usepackage{array}
 
 \usepackage{graphicx}
 \graphicspath{ {./images/} }
 \usepackage{placeins}
+
 \let\Oldsubsection\subsection
 \renewcommand{\subsection}{\FloatBarrier\Oldsubsection}
 
@@ -113,5 +115,273 @@ Hence $w$ was matched $m''$ which she prefers higher than both $m$ and $m'$. Thi
 \newpage
 
 \exercise
+\emph{Q) Implement the stable matching algorithm.}
 
+Here I have implemented the Gayle Shapely algorithm. Men propose to women and women accept the proposal if they are unmatched or the proposal is preferred compared to the current match. The specific implementation uses a set of unmatched men.
+\begin{verbatim}
+
+men
+[[2 1 3 0] 
+ [0 1 3 2] 
+ [0 1 2 3] 
+ [0 1 2 3]]
+
+women      
+[[0 2 1 3] 
+ [2 0 3 1] 
+ [3 2 1 0] 
+ [2 3 1 0]]
+0 proposes to 2 [2,-1] Accepted
+1 proposes to 0 [0,-1] Accepted
+2 proposes to 0 [0,1] Accepted
+3 proposes to 0 [0,2] Rejected
+3 proposes to 1 [1,-1] Accepted
+1 proposes to 1 [1,3] Rejected
+1 proposes to 3 [3,-1] Accepted
+
+matches
+ [2, 3, 0, 1]
+
+\end{verbatim}
+\begin{python}
+
+# question4.py
+
+import numpy as np
+import dataclasses
+
+
+@dataclasses.dataclass
+class Person:
+    index: int
+    pref_list: list
+    current_match: int = -1  # accepted
+
+class Man(Person):
+    total_proposed: int = 0  # may or may not be accepted
+    def get_next_woman(self):
+        return self.pref_list[self.total_proposed]
+    @property
+    def mrank(self):
+        return self.total_proposed
+
+
+class Woman(Person):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.pref_dict = {m: i for i, m in enumerate(self.pref_list)}
+        del self.pref_list
+    def __str__(self):
+        return super().__str__() + str(self.pref_dict)
+    def __repr__(self):
+        return super().__repr__() + str(self.pref_dict)
+    @property
+    def wrank(self):
+        return self.pref_dict[self.current_match]
+
+
+class GayleShapely:
+    def __init__(self, m: list, w: list, trace=True):
+
+        m = np.array(m)
+        w = np.array(w)
+        self.men = [Man(i, pref) for i, pref in enumerate(m)]
+        self.women = [Woman(i, pref) for i, pref in enumerate(w)]
+        self.trace = trace
+        
+        self.free_men = set([m.index for m in self.men])
+        if trace:
+            print('men')
+            print(m)
+            print('women')
+            print(w)
+
+    def _get_next_free_m(self):
+        return self.men[self.free_men.pop()] if len(self.free_men) >0 else None
+
+    def _matched(self, man: Man, woman: Woman):
+        man.current_match = woman.index
+        if woman.current_match > -1:
+            self.men[woman.current_match].current_match = -1
+            self.free_men.add(woman.current_match)
+        woman.current_match = man.index
+
+        
+
+
+    def _propose(self, man, woman):
+        man.total_proposed += 1
+        result = "Rejected"
+        woman_prev_match = woman.current_match
+        if (
+            woman.current_match == -1
+            or woman.pref_dict[man.index] < woman.pref_dict[woman.current_match] #this is rank so lower is better
+        ):
+            self._matched(man, woman)
+            result = "Accepted"
+
+        if self.trace:
+            print(
+                f"{man.index} proposes to {woman.index} [{woman.index},{woman_prev_match}] {result}"
+            )
+        return result == "Accepted"
+
+    def match(self):
+        """
+        m and w are objects
+        """
+        m = self._get_next_free_m()
+        
+        while m is not None:
+            accepted = False
+            while not accepted:
+                # select next woman
+                w = self.women[ m.get_next_woman()]
+                # _propose
+                accepted = self._propose(m, w)
+            m = self._get_next_free_m()
+        if self.trace:
+            print('matches\n',self.get_matches())
+
+    def get_matches(self):
+        return [m.current_match for m in self.men]
+
+    def get_mranks(self):
+        return [m.mrank for m in self.men]
+    
+    
+    def get_wranks(self):
+        return [w.wrank for w in self.women]
+
+    @property
+    def MGoodness(self):
+        return sum(self.get_mranks())/len(self.men)
+    
+    @property
+    def WGoodness(self):
+        return sum(self.get_wranks())/len(self.women)
+
+def main():
+    m = [
+        [2,1,3,0],
+        [0,1,3,2],
+        [0,1,2,3],
+        [0,1,2,3]
+    ]
+
+    w = [
+        [0,2,1,3],
+        [2,0,3,1],
+        [3,2,1,0],
+        [2,3,1,0]
+    ]
+    algo = GayleShapely(m,w)
+    algo.match()
+
+if __name__ == "__main__":
+    main()
+\end{python}
+
+\newpage
+
+\exercise
+
+\emph{Q. Write an input generator which creates completely random preference lists, so that each M has a random permutation of the W’s for preference, and vice-versa}
+\begin{python}
+from question4 import Man, Woman, GayleShapely
+import random
+import numpy as np
+import time
+import pandas as pd
+import matplotlib.pyplot as plt
+import math
+plt.style.use('ggplot')
+
+def generate_random_permutations(n):
+    return [np.random.permutation(range(n)).tolist() for i in range(n)]
+
+def main():
+    results = {}
+    for n in [8000]:
+        random.seed(46)
+        
+        m = generate_random_permutations(n)
+        w = generate_random_permutations(n)
+
+        algo = GayleShapely(m, w, trace = False)
+        
+        start = time.time_ns()/1000
+        algo.match()
+        end = time.time_ns()/1000
+        
+        total_time = end-start
+        
+        results[n]= pd.Series({
+                'time_micros':total_time,
+                'MGoodness':algo.MGoodness,
+                'WGoodness':algo.WGoodness,
+                'time_ms/CouponCollector':total_time/theoritical_cn(n)
+            })
+    df =  pd.DataFrame(results).T
+    return df
+
+def theoritical_cn(n):
+    return n * math.log(n) + 0.57 * n
+
+if __name__=='__main__':
+    result = main()
+    print(result)
+
+    fig, axes = plt.subplots(2,2, sharex = True)
+    axes = axes.reshape(-1)
+    # print(axes)
+    for i, col in enumerate(result.columns):
+        axes[i].plot(result.index, result[col])
+        axes[i].set_ylabel(col)
+        axes[i].set_xlabel('n')
+    plt.show()
+\end{python}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{images/q5.png}
+    \caption{Growth rate of Goodness and run time}
+    \label{fig:q5}
+\end{figure}
+
+\begin{table}
+\centering
+\caption{Question 5 results}
+\label{table:q5}
+\small\addtolength{\tabcolsep}{-1pt}
+\begin{tabular}{lrrrrrrr}
+\toprule
+{} &  time($\mu$s) &  MGoodness &  WGoodness &  time/CouponColl &  MGoodness/logn &  Wgoodness/n &  time/nlogn \\
+n    &              &            &            &                              &                 &              &             \\
+\midrule
+500  &      6000.25 &   7.936000 &    64.3340 &                     1.768783 &        1.276991 &     0.128668 &    1.931015 \\
+1000 &     17031.25 &   9.421000 &   105.5240 &                     2.277589 &        1.363829 &     0.105524 &    2.465526 \\
+2000 &     44999.00 &   8.495500 &   239.4845 &                     2.753613 &        1.117696 &     0.119742 &    2.960109 \\
+3000 &     58276.50 &   8.398667 &   362.2550 &                     2.265003 &        1.048998 &     0.120752 &    2.426256 \\
+5000 &    181921.75 &   9.585400 &   519.9838 &                     4.003915 &        1.125418 &     0.103997 &    4.271871 \\
+8000 &    270089.50 &   7.641625 &  1026.2355 &                     3.532541 &        0.850279 &     0.128279 &    3.756587 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{enumerate}
+    \item Q. how does the goodness change for M and W?
+
+MGoodness grows at the rate of $O(logn)$ while WGoodness grows at a rate less than $O(n)$. The growth rates might not be exact but the constant ratio gives an indication of the upper bound. Clearly the algorithm is not favourable for women.
+
+    \item Q. How does the run time of the code vary as a function of n?\\
+
+Run time grows approximately at a rate of $O(n log n )$
+
+    \item Q. How do your results relate to result from the coupon\\ collector problem?
+
+The ratio of runtime and Coupon Collector theoritical value is almost a constant at every n. Approximately the growth rates seem to match. 
+
+Note: the constant values are slightly higher for higher $n$. But there can be other constraints like ineffecient memory management, processor throttling which might increase runtime at higher $n$. But the overall constant ratio makes this algorithm runtime comparable with coupon collector. 
+\end{enumerate}
 \end{document}

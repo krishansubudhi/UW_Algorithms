@@ -384,4 +384,218 @@ The ratio of runtime and Coupon Collector theoritical value is almost a constant
 
 Note: the constant values are slightly higher for higher $n$. But there can be other constraints like ineffecient memory management, processor throttling which might increase runtime at higher $n$. But the overall constant ratio makes this algorithm runtime comparable with coupon collector. 
 \end{enumerate}
+
+\newpage
+\exercise
+\emph{Q. Rewrite your stable matching generator, so that you compute stable matchings for very large, random instances.}
+\begin{python}
+import numpy as np
+import dataclasses
+import random
+import sys
+
+'''
+Rewrite your stable matching generator, so that you compute stable matchings for very large, random instances. The key idea is to generate the random permutations incrementally, so that you only construct the random preferences when they are needed
+'''
+@dataclasses.dataclass
+class Man():
+    index: int
+    n:int
+    proposed_set: set = dataclasses.field(default_factory=set)
+    current_match: int = -1  # accepted
+
+    def get_random_proposee(self):
+        random_woman = random.randint(0,self.n-1)
+        if random_woman in self.proposed_set:
+            return self.get_random_proposee()
+        self.proposed_set.add(random_woman)
+        return random_woman
+
+    def accepted(self,w):
+        self.current_match = w
+
+    def dumped(self):
+        self.current_match = -1
+
+    @property
+    def mrank(self):
+        assert self.current_match > -1
+        return len(self.proposed_set)
+
+    def __repr__(self):
+        return str(self.index)
+
+@dataclasses.dataclass
+class Woman():
+    index: int
+    n:int
+    proposed_set: set = dataclasses.field(default_factory=set)
+    current_match: int = -1  # accepted
+    current_match_rank: int = -1
+
+    def accept_proposal(self, m):
+        preference = self.get_random_rank()
+        if preference > self.current_match_rank:
+            self.current_match = m
+            self.current_match_rank = preference
+            return True
+        return False
+
+    def get_random_rank(self):
+        random_rank = random.randint(0,self.n-1)
+        if random_rank in self.proposed_set:
+            return self.get_random_rank()
+        self.proposed_set.add(random_rank)
+        return random_rank
+
+    @property
+    def wrank(self):
+        return self.current_match_rank
+    
+    
+    def __repr__(self):
+        return str(self.index)
+
+
+class GayleShapelyRandom:
+    def __init__(self, n, trace=True):
+
+        self.men = [Man(i, n) for i in range(n)]
+        self.women = [Woman(i, n) for i in range(n)]
+        self.trace = trace
+        
+        self.free_men = set([m.index for m in self.men])
+        if trace:
+            print('men')
+            print(self.men)
+            print('women')
+            print(self.women)
+
+    def _get_next_free_m(self):
+        return self.men[self.free_men.pop()] if len(self.free_men) >0 else None
+
+    def _matched(self, man: Man, woman: Woman, woman_prev_match:int):
+        man.accepted(woman.index)
+        if woman_prev_match > -1:
+            self.men[woman_prev_match].dumped()
+            self.free_men.add(woman_prev_match)
+
+
+    def _propose(self, man, woman):
+
+        woman_prev_match = woman.current_match
+        accepted = woman.accept_proposal(man.index)
+
+        if accepted:
+            self._matched(man, woman, woman_prev_match)
+
+        if self.trace:
+            print(
+                f"{man.index} proposes to {woman.index} [{woman.index},{woman_prev_match}] {accepted}"
+            )
+        return accepted
+
+    def match(self):
+        """
+        m and w are objects
+        """
+        m = self._get_next_free_m()
+        
+        while m is not None:
+            accepted = False
+            while not accepted:
+                # select next woman
+                w = m.get_random_proposee()
+                w = self.women[w]
+                # _propose
+                accepted = self._propose(m, w)
+            m = self._get_next_free_m()
+        if self.trace:
+            print('matches\n',self.get_matches())
+
+    def get_matches(self):
+        return [m.current_match for m in self.men]
+
+    def get_mranks(self):
+        return [m.mrank for m in self.men]
+    
+    
+    def get_wranks(self):
+        return [w.wrank for w in self.women]
+
+    @property
+    def MGoodness(self):
+        return sum(self.get_mranks())/len(self.men)
+    
+    @property
+    def WGoodness(self):
+        return sum(self.get_wranks())/len(self.women)
+        
+import time
+import pandas as pd
+def main2():
+    results = {}
+    random.seed(47)
+    for n in [1_000_000]:#[1_000, 10_000, 100_000]:
+        print(f'n =  {n}')
+        total_time = 0
+        MGoodness = 0
+        WGoodness = 0
+        iterations = 2
+        for i in range(iterations):
+            print(f'iteration {i+1}')
+            algo = GayleShapelyRandom(n, trace = False)
+            start = time.time()
+            algo.match()
+            end = time.time()
+            
+            total_time += (end-start)
+            MGoodness += algo.MGoodness
+            WGoodness += algo.WGoodness
+        
+        results[n]= pd.Series({
+                'time_s':total_time/iterations,
+                'MGoodness':MGoodness/iterations,
+                'WGoodness':WGoodness/iterations
+            })
+    df =  pd.DataFrame(results).T
+    print(df)
+    return df
+
+if __name__ == "__main__":
+    main2()
+\end{python}
+
+\emph{Q. Write a summary of your results for large n, including both the statistics for rank/goodness, as well as recorded run-time of the program.}
+
+\begin{table}[h]
+\centering
+\caption{Question 6 results}
+\label{table:q6}
+\small\addtolength{\tabcolsep}{-1pt}
+\begin{tabular}{lrrrrrr}
+\toprule
+{} &      time\_s &  MGoodness &      WGoodness &  mGoodness/logn &  Wgoodness/n &  time/nlogn \\
+n       &             &            &                &                 &              &             \\
+\midrule
+1000    &    0.043 &   7.026 &     861.776 &        1.017 &     0.861 &    6E-6 \\
+10000   &    0.602 &  11.491 &    9087.755 &        1.247 &     0.908 &    7E-6 \\
+100000  &   14.337 &  11.838 &   91496.482 &        1.028 &     0.914 &    1.2E-5 \\
+1000000 &  267.126 &  14.845 &  932650.559 &        1.074 &     0.932 &    1.9E-5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\emph{Q. What does the estimated growth rate in runtime}
+
+All results are averaged over 5 iterations. Growth rate of MGoodness is $O(logn)$ and growth of Wgoodness is $O(n)$. Runtime is higher than  $O(nlogn)$ but lower than $O(n^2)$. Run time is calculated as system time and can involve CPU throttling and memory inefficiency at higher n too.
+
+\emph{!. In your write up describe your process for incrementally generating random permutations.}
+
+Instead of creating all the random permutations beforehand which required $O(n^2)$ memory, the permutations are generated incrementally.
+
+When a particular man $m$ had to propose a new woman, the woman $w$ was selected randomly from the set of all women to which $m$ had never proposed previously. Each men only stored information of women they had previously proposed. Since $m$s propose $log n$ women on average, the space requirement reduced to $O(n logn)$. 
+
+Similarly, for a woman $w$, only ranks of those men were stored which had already proposed her. When a new man proposed, his rank was selected randomly from a set of all possible ranks minus the ranks of men who had previously proposed $w$.  Since each $m$ proposes $log n$ women on average, each woman was proposed $log n$ times on average too. The space requirement for women also reduced to $O(n logn)$. 
+
 \end{document}

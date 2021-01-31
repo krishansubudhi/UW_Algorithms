@@ -71,5 +71,5 @@ if __name__ == '__main__':
             hashing.assign_n_items()
             max_items = hashing.max_items()
             ratio = max_items/np.log(np.log(n)) if n>1 else max_items/(np.log(n)/np.log(np.log(n)))
-            logger.info(f'n = {n}, k = {k}, max_items = {max_items}, max_items/loglogn = {ratio:.3}, std = {hashing.std():.3}')
+            logger.info(f'n = {n}, k = {k}, max_items = {max_items}, ratio = {ratio:.3}, std = {hashing.std():.3}')
 

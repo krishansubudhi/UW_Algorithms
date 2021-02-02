@@ -1,0 +1,101 @@
+\documentclass{homeworg}
+
+\title{CSEP 521, Winter 2021: Homework 4}
+\author{Krishan Subudhi (ksubudhi@uw.edu) - 2040900}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{pythonhighlight}
+\usepackage{enumitem}
+\usepackage{array}
+
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage{placeins}
+
+\let\Oldsubsection\subsection
+\renewcommand{\subsection}{\FloatBarrier\Oldsubsection}
+
+\begin{document}
+
+\maketitle
+
+\exercise
+\emph{Q: Show that the number 1048579 = 220 + 3 is not prime without factoring the number}
+
+Fermat's theorm : 
+\[a^{p-1} \mod p = 1,  \text{if $p$ is prime.}\]
+
+$p = 1048579 = 2^{20} + 3$
+
+Let's take $a = 2$. Now if we can prove $2^{2^{20}+2} \mod 1048579$ is not 1, then p is not a prime.
+
+\begin{align*}
+2^{2^3} \mod 1048579 &= (2^{2^2} \mod 1048579 \ast 2^{2^2} \mod 1048579) \mod 1048579 &= 256\\
+2^{2^4} \mod 1048579 &= (2^{2^3} \mod 1048579 \ast 2^{2^3} \mod 1048579) \mod 1048579 &= 65536\\
+2^{2^5} \mod 1048579 &= (2^{2^4} \mod 1048579 \ast 2^{2^4} \mod 1048579) \mod 1048579 &= 1036291\\
+2^{2^6} \mod 1048579 &= (2^{2^5} \mod 1048579 \ast 2^{2^5} \mod 1048579) \mod 1048579 &= 1048147\\
+2^{2^7} \mod 1048579 &= (2^{2^6} \mod 1048579 \ast 2^{2^6} \mod 1048579) \mod 1048579 &= 186624\\
+\texttt{...}\\
+\texttt{...}\\
+2^{2^{19}} \mod 1048579 &= (2^{2^{18}} \mod 1048579 \ast 2^{2^{18}} \mod 1048579) \mod 1048579 &= 870510\\
+2^{2^{20}} \mod 1048579 &= (2^{2^{19}} \mod 1048579 \ast 2^{2^{19}} \mod 1048579) \mod 1048579 &= 588380
+\end{align*}
+
+Hence ,
+
+\[
+2^{2^{20}+2} \mod 1048579 = ( {2^{2^{20}} \mod 1048579 \ast 2^{2} \mod 1048579} ) \mod 1048579 = 256362
+\]
+
+Since $256362 \ne 1$, the number 1048579 is not a prime.
+
+\newpage
+\exercise
+
+A hash table of size m is used to store n items, with $n \le m/2$, so the load factor is at most $\frac{1}{2}$
+
+Open addressing is used for collision resolution.
+
+\emph{a) Assuming uniform hashing, show that for $i =1, 2,. .., n$, the probability that the $i$-th insertion requires strictly more than k probes is at most $2^{-k}$}
+
+P ($i$-th insertion requires strictly more than k probes is at most $2^{-k}$)
+
+= P ( first $k$ hashes in $i$-th iteration end up in collision)
+\begin{align*}
+P &=\left(\frac{i-1}{m}\right)^k\\
+&\le \left(\frac{n}{m}\right)^k\\
+&\le \left(\frac{m/2}{m}\right)^k\\
+&\le 2^{-k}
+\end{align*}
+
+\emph{b) Show that for $i =1, 2,. .., n$, the probability that the $i$-th insertion requires more than $2 log n$ probes is at most $1/n^2$.}
+We previously showed in (a) that ,
+
+$$P (i-\text{th insertion requires strictly more than k probes}) \le 2^{-k}$$
+Hence for $k = 2 log n$,
+\begin{align*}
+    P (i-\text{th insertion requires strictly more than $2 log n $ probes})&\le 2^{-2 logn}\\
+    &\le \frac{1}{n^2} 
+\end{align*}
+
+Hence, the probability that the $i$-th insertion requires more than $2 log n$ probes is at most $1/n^2$
+
+
+\textbf{c,d Definitions}:
+
+$X_i$ = the number of probes required by the $i$-th insertion
+As per (b), $P({X_i > 2 log n}) \le 1/n^2$ 
+
+$X = max_{1\le i\le n} X_i$ = maximum number of probes required by any of the $n$ insertions
+
+\emph{c) Show that $Pr({X> 2 log n}) \le 1/n$}
+
+\begin{align*}
+    P({X> 2 log n}) &= P((X_1> 2 log n) \cup (X_2> 2 log n) \cup... \cup (X_n> 2 log n)) \\
+    &\le P((X_1> 2 log n) + (X_2> 2 log n) +... + (X_n> 2 log n)) \\
+    &\le n \ast  \frac{1}{n^2} \\
+    &\le \frac{1}{n} 
+\end{align*}
+Proved
+\end{document}

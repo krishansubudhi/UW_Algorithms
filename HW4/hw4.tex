@@ -15,6 +15,7 @@
 
 \let\Oldsubsection\subsection
 \renewcommand{\subsection}{\FloatBarrier\Oldsubsection}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 
 \begin{document}
 
@@ -69,33 +70,99 @@ P &=\left(\frac{i-1}{m}\right)^k\\
 &\le 2^{-k}
 \end{align*}
 
-\emph{b) Show that for $i =1, 2,. .., n$, the probability that the $i$-th insertion requires more than $2 log n$ probes is at most $1/n^2$.}
+\emph{b) Show that for $i =1, 2,. .., n$, the probability that the $i$-th insertion requires more than $2 \log n$ probes is at most $1/n^2$.}
 We previously showed in (a) that ,
 
 $$P (i-\text{th insertion requires strictly more than k probes}) \le 2^{-k}$$
-Hence for $k = 2 log n$,
+Hence for $k = 2 \log n$,
 \begin{align*}
-    P (i-\text{th insertion requires strictly more than $2 log n $ probes})&\le 2^{-2 logn}\\
+    P (i-\text{th insertion requires strictly more than $2 \log n $ probes})&\le 2^{-2 \log n}\\
     &\le \frac{1}{n^2} 
 \end{align*}
 
-Hence, the probability that the $i$-th insertion requires more than $2 log n$ probes is at most $1/n^2$
+Hence, the probability that the $i$-th insertion requires more than $2 \log n$ probes is at most $1/n^2$
 
 
 \textbf{c,d Definitions}:
 
 $X_i$ = the number of probes required by the $i$-th insertion
-As per (b), $P({X_i > 2 log n}) \le 1/n^2$ 
+As per (b), $P({X_i > 2 \log n}) \le 1/n^2$ 
 
 $X = max_{1\le i\le n} X_i$ = maximum number of probes required by any of the $n$ insertions
 
-\emph{c) Show that $Pr({X> 2 log n}) \le 1/n$}
+\emph{c) Show that $Pr({X> 2 \log n}) \le 1/n$}
 
 \begin{align*}
-    P({X> 2 log n}) &= P((X_1> 2 log n) \cup (X_2> 2 log n) \cup... \cup (X_n> 2 log n)) \\
-    &\le P((X_1> 2 log n) + (X_2> 2 log n) +... + (X_n> 2 log n)) \\
+    P({X> 2 \log n}) &= P((X_1> 2 \log n) \cup (X_2> 2 \log n) \cup... \cup (X_n> 2 \log n)) \\
+    &\le P((X_1> 2 \log n) + (X_2> 2 \log n) +... + (X_n> 2 \log n)) \\
     &\le n \ast  \frac{1}{n^2} \\
-    &\le \frac{1}{n} 
+    &\le \frac{1}{n} \numberthis \label{eqn_c}
 \end{align*}
 Proved
+
+\emph{d) Show that the expected length of the longest probe sequence is $E[X]= O(\log n)$}
+
+\begin{align*}
+    E(X) &= \sum_{k=1}^n k \ P(X=k)\\
+    &= \sum_{k=1}^{2 \log n} k \ P(X=k) + \sum_{n > 2 \log n }^n k \ P(X=k)\\
+    &\le 2 \log n \sum_{k=1}^{2\log n} P(X=k) + n \sum_{k > 2\log n}^n P(X=k) \numberthis \label{eqn_d1}
+\end{align*}
+As per \ref{eqn_c}, $Pr({X> 2 \log n}) \le 1/n$.
+
+\[
+    \implies \sum_{k > 2\log n}^n P(X=k) = Pr({X> 2 \log n}) \le \frac{1}{n}
+\]
+
+Also,
+\[
+    \sum_{k=1}^{2\log n} P(X=k) = Pr({X\le 2 \log n}) \le 1
+\]
+Hence equation \ref{eqn_d1} can be written as
+\begin{align*}
+    E(X) &\le 2 \log n \ast 1 +n \ast \frac{1}{n}\\
+    &\le 2\log n +1 \numberthis\label{eqn_d2}
+\end{align*}
+
+Hence as per \ref{eqn_d2} ,     $E(X) = O(\log n)$.
+
+\newpage
+\exercise
+We have a bloom filter that uses a table of size $n$ with $k$ hash functions.
+
+We are asked to adapt your Bloom filter to a setting where the table is of size $n/2$
+
+Let's assume that $n$ is a power of $2$.
+\[
+    n = 2^x
+\]
+
+To reduce the size of exiting boom filter but retain current information, we can \begin{itemize}
+    \item $OR$ the two halves. The first half will be replaced with the bits from the $OR$ operation. The 2nd half will be discarded.
+    \item The hash functions needs to map bits in 2nd half to the corresponding bits in the first half. 
+    
+    Since $n=2^x$ , the hash function must be using $x$ bits for finding bit location in the bloom filter. Now if we mask the most significant bit, from the hash function output, the remaining $x-1$ bits will map to the first half of the bloom filter. For example if n =8, and hash function output was 7(111) before, now it will map to the $3^{rd}$ bit .
+    \item The $OR$ operation + masking will avoid losing existing data.
+\end{itemize}
+
+Let's say the bloom filter had $m$ entries before. 
+
+Previously before shrinking, 
+\begin{align*}
+    P(\text{a particular bit is 0}) &= \left(1-\frac{1}{n}\right)^{km} = e^{-km/n}\\
+    P(\text{fasle positive}) &= (1-P(\text{a particular bit is 0}))^k\\
+    &= (1-e^{-km/n})^k = (1-p)^k\numberthis\label{eqn_3_before}
+\end{align*}
+Where $p = e^{-km/n}$.
+
+After shrinking, 
+\begin{align*}
+    P(\text{a particular bit i is 0}) &= P(\text{a particular bit i is 0}) \ast P(\text{a particular bit n/2+i was 0})  \\
+    &= e^{-km/n} \ast e^{-km/n} = p^2\\
+    P(\text{fasle positive}) &= (1-P(\text{a particular bit i is 0}))^k\\
+    &= (1-p^2)^k\numberthis\label{eqn_3_after}
+\end{align*}
+
+Hence as per \ref{eqn_3_before}, and \ref{eqn_3_after},
+False positive probability will increase by $(1-p^2)^k/ (1-p)^k = (1+p)^k$ times. 
+
 \end{document}

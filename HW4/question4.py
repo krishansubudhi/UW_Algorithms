@@ -29,7 +29,7 @@ class KchoiceHashing():
         self.logger = logging.getLogger(name = __name__)
         # random hash functions with different seeds.
         # Each hash function is a random number generator.
-        self.h = [random.Random(i) for i in range(k)]
+        self.h = [random.Random() for i in range(k)]
 
     def assign_item(self, item = None):
         '''Assigns a new item to a bucket.
@@ -64,31 +64,35 @@ import pandas as pd
 import matplotlib.pyplot as plt
 if __name__ == '__main__':
 
-    # logging.basicConfig(level=logging.INFO)
-    # logger = logging.getLogger(name = __name__)
-    # series = []
-    # for n in [1_000,10_000,100_000,1_000_000]:
-    #     for k in [1,2,3]:
-    #         hashing = KchoiceHashing(n,k)
-    #         hashing.assign_n_items()
-    #         max_items = hashing.max_items()
-    #         ratio = max_items/np.log(np.log(n))
-    #         ratio2 = max_items/(np.log(n)/np.log(np.log(n)))
-    #         s = {
-    #             'n':n,
-    #             'k':k,
-    #             'max_items':max_items,
-    #             'max_items/log logn': ratio,
-    #             'max_items/(log n/ log log n)': ratio2,
-    #             'standard Deviation':hashing.std()
-    #         }
-    #         series.append(s) 
-    #         logger.info(f'n = {n}, k = {k}, max_items = {max_items}, ratio = {ratio:.3}, std = {hashing.std():.3}')
-    # df = pd.DataFrame(series)
-    # df = df.set_index(['n','k'])
-    # print(df.to_latex())
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(name = __name__)
+    series = []
+    for n in [1_000,10_000,100_000,1_000_000]:
+        for k in [1,2,3]:
+            max_items = 0
+            total_iterations = 10
+            for iteration in range(total_iterations):
+                hashing = KchoiceHashing(n,k)
+                hashing.assign_n_items()
+                max_items += hashing.max_items()
+            max_items = max_items/total_iterations
+            ratio = max_items/np.log(np.log(n))
+            ratio2 = max_items/(np.log(n)/np.log(np.log(n)))
+            s = {
+                'n':n,
+                'k':k,
+                'max_items':max_items,
+                'max_items/log logn': ratio,
+                'max_items/(log n/ log log n)': ratio2,
+                'standard Deviation':hashing.std()
+            }
+            series.append(s) 
+            logger.info(f'n = {n}, k = {k}, max_items = {max_items}, ratio = {ratio:.3}, std = {hashing.std():.3}')
+    df = pd.DataFrame(series)
+    df = df.set_index(['n','k'])
+    print(df.to_latex())
 
-    # df.to_csv('q4_out.csv')
+    df.to_csv('q4_out.csv')
 
     n = 1024
     vals = {}

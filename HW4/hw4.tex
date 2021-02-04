@@ -22,16 +22,19 @@
 \maketitle
 
 \exercise
-\emph{Q: Show that the number 1048579 = 220 + 3 is not prime without factoring the number}
+\emph{Q: Show that the number $1048579 = 2^{20} + 3$ is not prime without factoring the number}
 
 Fermat's theorm : 
-\[a^{p-1} \mod p = 1,  \text{if $p$ is prime.}\]
+\[a^{p-1} \mod p = 1,  \text{if $p$ is prime,}\quad \text{for all } a,1 \le a \le p \]
+We need to find an $a$ where Fermat's theorm fails to prove that the number $1048579$ is composite.
 
-$p = 1048579 = 2^{20} + 3$
+$number = 1048579 = 2^{20} + 3$
 
 Let's take $a = 2$. Now if we can prove $2^{2^{20}+2} \mod 1048579$ is not 1, then p is not a prime.
 
 \begin{align*}
+2^{2^1} \mod 1048579 &= (2^{2^0} \mod 1048579 \ast 2^{2^0} \mod 1048579) \mod 1048579 &= 4\\
+2^{2^2} \mod 1048579 &= (2^{2^1} \mod 1048579 \ast 2^{2^1} \mod 1048579) \mod 1048579 &= 16\\
 2^{2^3} \mod 1048579 &= (2^{2^2} \mod 1048579 \ast 2^{2^2} \mod 1048579) \mod 1048579 &= 256\\
 2^{2^4} \mod 1048579 &= (2^{2^3} \mod 1048579 \ast 2^{2^3} \mod 1048579) \mod 1048579 &= 65536\\
 2^{2^5} \mod 1048579 &= (2^{2^4} \mod 1048579 \ast 2^{2^4} \mod 1048579) \mod 1048579 &= 1036291\\
@@ -85,10 +88,11 @@ Hence, the probability that the $i$-th insertion requires more than $2 \log n$ p
 
 \textbf{c,d Definitions}:
 
-$X_i$ = the number of probes required by the $i$-th insertion
+$X_i$ = the number of probes required by the $i$-th insertion.
+
 As per (b), $P({X_i > 2 \log n}) \le 1/n^2$ 
 
-$X = max_{1\le i\le n} X_i$ = maximum number of probes required by any of the $n$ insertions
+$X = \max_{1\le i\le n} X_i$ = maximum number of probes required by any of the $n$ insertions
 
 \emph{c) Show that $Pr({X> 2 \log n}) \le 1/n$}
 
@@ -107,16 +111,18 @@ Proved
     &= \sum_{k=1}^{2 \log n} k \ P(X=k) + \sum_{n > 2 \log n }^n k \ P(X=k)\\
     &\le 2 \log n \sum_{k=1}^{2\log n} P(X=k) + n \sum_{k > 2\log n}^n P(X=k) \numberthis \label{eqn_d1}
 \end{align*}
+
+\[
+    \sum_{k=1}^{2\log n} P(X=k) = Pr({X\le 2 \log n}) \le 1
+\]
+
 As per \ref{eqn_c}, $Pr({X> 2 \log n}) \le 1/n$.
 
 \[
     \implies \sum_{k > 2\log n}^n P(X=k) = Pr({X> 2 \log n}) \le \frac{1}{n}
 \]
 
-Also,
-\[
-    \sum_{k=1}^{2\log n} P(X=k) = Pr({X\le 2 \log n}) \le 1
-\]
+
 Hence equation \ref{eqn_d1} can be written as
 \begin{align*}
     E(X) &\le 2 \log n \ast 1 +n \ast \frac{1}{n}\\
@@ -129,21 +135,22 @@ Hence as per \ref{eqn_d2} ,     $E(X) = O(\log n)$.
 \exercise
 We have a bloom filter that uses a table of size $n$ with $k$ hash functions.
 
-We are asked to adapt your Bloom filter to a setting where the table is of size $n/2$
+We are asked to adapt this Bloom filter to a setting where the table is of size $n/2$
 
 Let's assume that $n$ is a power of $2$.
 \[
     n = 2^x
 \]
 
-To reduce the size of exiting boom filter but retain current information, we can \begin{itemize}
+To reduce the size of exiting boom filter but retain current information, we can halve the table and 
+\begin{itemize}
     \item $OR$ the two halves. The first half will be replaced with the bits from the $OR$ operation. The 2nd half will be discarded.
     \item The hash functions needs to map bits in 2nd half to the corresponding bits in the first half. 
     
-    Since $n=2^x$ , the hash function must be using $x$ bits for finding bit location in the bloom filter. Now if we mask the most significant bit, from the hash function output, the remaining $x-1$ bits will map to the first half of the bloom filter. For example if n =8, and hash function output was 7(111) before, now it will map to the $3^{rd}$ bit .
-    \item The $OR$ operation + masking will avoid losing existing data.
+    Since $n=2^x$ , the hash function must be using $x$ bits for finding bit location in the bloom filter. Now if we mask the most significant bit, from the hash function output, the remaining $x-1$ bits will map to the first half of the bloom filter. For example if n =8, and hash function output was 7(111) before, now it will map to 3 .
+    \item The $OR$ operation + masking will avoid losing existing data as the old data if mapped with the masked hash function would have set the bits now set by the OR operation.
 \end{itemize}
-
+\subsection{Performance}
 Let's say the bloom filter had $m$ entries before. 
 
 Previously before shrinking, 
@@ -156,7 +163,7 @@ Where $p = e^{-km/n}$.
 
 After shrinking, 
 \begin{align*}
-    P(\text{a particular bit i is 0}) &= P(\text{a particular bit i is 0}) \ast P(\text{a particular bit n/2+i was 0})  \\
+    P(\text{a particular bit i is 0}) &= P(\text{bit i is 0}) \ast P(\text{bit n/2+i was 0})  \\
     &= e^{-km/n} \ast e^{-km/n} = p^2\\
     P(\text{fasle positive}) &= (1-P(\text{a particular bit i is 0}))^k\\
     &= (1-p^2)^k\numberthis\label{eqn_3_after}
@@ -166,62 +173,54 @@ Hence as per \ref{eqn_3_before}, and \ref{eqn_3_after},
 False positive probability will increase by $(1-p^2)^k/ (1-p)^k = (1+p)^k$ times. 
 \newpage
 \exercise
-'''
-\subsection{Algorithm}
-Two choice hashing uses two hash function and assigns items to the least used bucket. 
 
-\subsection{Assumptions}
-For this problem, you will assume a chaining implementation of hashing, since you are counting the number of elements assigned to buckets (but you don’t need to implement chaining, since you only need the counts.
-
-
-You may assume that your hash functions are perfectly random. 
-
-For each experiment you run, you should hash n items into n cells. 
-
-\subsection{Metric}
-The statistic of most interest is the maximum number of items assigned to a cell, 
-
-but computing the standard deviation is also of interest.
 
 \subsection{Description}
-Here I have implemented $k$ choice hashing. $n$ items are hashed using $k$ hash functions(simulated). Item will be assigned to one of the buckets selected by the hash functions. The bucket with the lowest count will be chosen as the destination for each element.
+Here I have implemented $k$ choice hashing. $n$ items are hashed using $k$ hash functions (simulated). Item will be assigned to one of the buckets selected by the hash functions. The bucket with the lowest count will be chosen as the destination for each element.
 
 \subsection{Result}
 \begin{table}[h]
     \centering
+    
     \begin{tabular}{llrrrr}
     \toprule
-            &   &  max\_items &  max\_items/log logn &  max\_items/(log n/ log log n) &  Standard Deviation \\
+           &   &  max\_items &  max\_items/log logn &  max\_items/(log n/ log log n) &  standard Deviation \\
     n & k &            &                     &                               &                     \\
     \midrule
-    1000    & 1 &          5 &            2.587128 &                      1.398895 &            1.027619 \\
-            & 2 &          3 &            1.552277 &                      0.839337 &            0.711337 \\
-            & 3 &          2 &            1.034851 &                      0.559558 &            0.589915 \\
-    10000   & 1 &          8 &            3.603073 &                      1.928551 &            1.001798 \\
-            & 2 &          3 &            1.351152 &                      0.723207 &            0.705833 \\
-            & 3 &          3 &            1.351152 &                      0.723207 &            0.595483 \\
-    100000  & 1 &          8 &            3.274032 &                      1.697897 &            1.001868 \\
-            & 2 &          4 &            1.637016 &                      0.848949 &            0.702382 \\
-            & 3 &          3 &            1.227762 &                      0.636711 &            0.594559 \\
-    1000000 & 1 &          9 &            3.427537 &                      1.710550 &            1.000499 \\
-            & 2 &          4 &            1.523350 &                      0.760245 &            0.704036 \\
-            & 3 &          3 &            1.142512 &                      0.570183 &            0.595970 \\
+    1000   & 1 &        5.1 &            2.638871 &                      1.426873 &            1.036340 \\
+           & 2 &        3.0 &            1.552277 &                      0.839337 &            0.689928 \\
+           & 3 &        2.3 &            1.190079 &                      0.643492 &            0.589915 \\
+    \midrule
+    10000  & 1 &        6.4 &            2.882459 &                      1.542841 &            0.998899 \\
+           & 2 &        3.1 &            1.396191 &                      0.747314 &            0.706682 \\
+           & 3 &        3.0 &            1.351152 &                      0.723207 &            0.597327 \\
+    \midrule
+    100000 & 1 &        8.2 &            3.355883 &                      1.740345 &            0.997477 \\
+           & 2 &        3.7 &            1.514240 &                      0.785277 &            0.701313 \\
+           & 3 &        3.0 &            1.227762 &                      0.636711 &            0.597930 \\
+    \midrule
+    1000000 & 1 &        8.7 &            3.313286 &                      1.653532 &            0.999492 \\
+            & 2 &        4.0 &            1.523350 &                      0.760245 &            0.703571 \\
+            & 3 &        3.0 &            1.142512 &                      0.570183 &            0.596419 \\
     \bottomrule
-    \end{tabular}
+\end{tabular}
 
-    \caption{$k$ choice hashing for different values of $n$}
+    \caption{$k$ choice hashing for different values of $n$ - average of 10 iterations}
     \label{tab:q4_result}
 \end{table}
 
-For k = 1, max\_items grow at the rate $O(logn/loglogn)$. For k>1, max\_items grows at the rate $O(loglogn)$ and    onstant factor decreases with increase in $k$ . Standard deviation is also lower for higher $k$ which means the distribution of items in buckets are more even with higher $k$.
 
-\begin{figure}
+
+For k = 1, max\_items grow at the rate $O(logn/loglogn)$. For k>1, max\_items grows at the rate $O(loglogn)$ and constant factor decreases with increase in $k$ . Standard deviation is also lower for higher $k$ which means the distribution of items in buckets are more even with higher $k$.
+
+\begin{figure}[h]
     \centering
-    \includegraphics{images/range_k.png}
-    \caption{k-choice hashing performance as k ranges from 1 to n}
+    \includegraphics[width=90mm,scale=0.5]{images/range_k.png}
+    \caption{$k$-choice hashing performance as $k$ ranges from 1 to $n$ for $n$=1000}
     \label{fig:my_label}
 \end{figure}
 \begin{python}
+
 import random
 import numpy as np
 import logging
@@ -236,7 +235,7 @@ class KchoiceHashing():
         self.logger = logging.getLogger(name = __name__)
         # random hash functions with different seeds.
         # Each hash function is a random number generator.
-        self.h = [random.Random(i) for i in range(k)]
+        self.h = [random.Random() for i in range(k)]
 
     def assign_item(self, item = None):
         '''Assigns a new item to a bucket.
@@ -268,6 +267,7 @@ class KchoiceHashing():
         return np.array(self.buckets).std()
 
 import pandas as pd
+import matplotlib.pyplot as plt
 if __name__ == '__main__':
 
     logging.basicConfig(level=logging.INFO)
@@ -275,9 +275,13 @@ if __name__ == '__main__':
     series = []
     for n in [1_000,10_000,100_000,1_000_000]:
         for k in [1,2,3]:
-            hashing = KchoiceHashing(n,k)
-            hashing.assign_n_items()
-            max_items = hashing.max_items()
+            max_items = 0
+            total_iterations = 10
+            for iteration in range(total_iterations):
+                hashing = KchoiceHashing(n,k)
+                hashing.assign_n_items()
+                max_items += hashing.max_items()
+            max_items = max_items/total_iterations
             ratio = max_items/np.log(np.log(n))
             ratio2 = max_items/(np.log(n)/np.log(np.log(n)))
             s = {
@@ -295,8 +299,7 @@ if __name__ == '__main__':
     print(df.to_latex())
 
     df.to_csv('q4_out.csv')
-    
-    
+
     n = 1024
     vals = {}
     for k in range(0,int(np.log2(n))+1):
@@ -312,6 +315,11 @@ if __name__ == '__main__':
     plt.ylabel('max_items')
     
     plt.show()
+    
+
+
+
+
 \end{python}
 
 

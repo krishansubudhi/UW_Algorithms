@@ -60,16 +60,52 @@ class KchoiceHashing():
     def std(self):
         return np.array(self.buckets).std()
 
+import pandas as pd
+import matplotlib.pyplot as plt
 if __name__ == '__main__':
 
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(name = __name__)
+    # logging.basicConfig(level=logging.INFO)
+    # logger = logging.getLogger(name = __name__)
+    # series = []
+    # for n in [1_000,10_000,100_000,1_000_000]:
+    #     for k in [1,2,3]:
+    #         hashing = KchoiceHashing(n,k)
+    #         hashing.assign_n_items()
+    #         max_items = hashing.max_items()
+    #         ratio = max_items/np.log(np.log(n))
+    #         ratio2 = max_items/(np.log(n)/np.log(np.log(n)))
+    #         s = {
+    #             'n':n,
+    #             'k':k,
+    #             'max_items':max_items,
+    #             'max_items/log logn': ratio,
+    #             'max_items/(log n/ log log n)': ratio2,
+    #             'standard Deviation':hashing.std()
+    #         }
+    #         series.append(s) 
+    #         logger.info(f'n = {n}, k = {k}, max_items = {max_items}, ratio = {ratio:.3}, std = {hashing.std():.3}')
+    # df = pd.DataFrame(series)
+    # df = df.set_index(['n','k'])
+    # print(df.to_latex())
 
-    for n in [1_000,10_000,100_000,1_000_000]:
-        for k in [1,2,3]:
-            hashing = KchoiceHashing(n,k)
-            hashing.assign_n_items()
-            max_items = hashing.max_items()
-            ratio = max_items/np.log(np.log(n)) if n>1 else max_items/(np.log(n)/np.log(np.log(n)))
-            logger.info(f'n = {n}, k = {k}, max_items = {max_items}, ratio = {ratio:.3}, std = {hashing.std():.3}')
+    # df.to_csv('q4_out.csv')
+
+    n = 1024
+    vals = {}
+    for k in range(0,int(np.log2(n))+1):
+        print(k)
+        k = 2**k
+        print(k)
+        hashing = KchoiceHashing(n,k)
+        hashing.assign_n_items()
+        max_items = hashing.max_items()
+        vals[k]= max_items
+    plt.plot(vals.keys(), vals.values())
+    plt.xlabel('k')
+    plt.ylabel('max_items')
+    
+    plt.show()
+    
+
+
 

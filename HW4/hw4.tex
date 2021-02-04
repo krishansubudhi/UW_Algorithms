@@ -164,5 +164,155 @@ After shrinking,
 
 Hence as per \ref{eqn_3_before}, and \ref{eqn_3_after},
 False positive probability will increase by $(1-p^2)^k/ (1-p)^k = (1+p)^k$ times. 
+\newpage
+\exercise
+'''
+\subsection{Algorithm}
+Two choice hashing uses two hash function and assigns items to the least used bucket. 
+
+\subsection{Assumptions}
+For this problem, you will assume a chaining implementation of hashing, since you are counting the number of elements assigned to buckets (but you don’t need to implement chaining, since you only need the counts.
+
+
+You may assume that your hash functions are perfectly random. 
+
+For each experiment you run, you should hash n items into n cells. 
+
+\subsection{Metric}
+The statistic of most interest is the maximum number of items assigned to a cell, 
+
+but computing the standard deviation is also of interest.
+
+\subsection{Description}
+Here I have implemented $k$ choice hashing. $n$ items are hashed using $k$ hash functions(simulated). Item will be assigned to one of the buckets selected by the hash functions. The bucket with the lowest count will be chosen as the destination for each element.
+
+\subsection{Result}
+\begin{table}[h]
+    \centering
+    \begin{tabular}{llrrrr}
+    \toprule
+            &   &  max\_items &  max\_items/log logn &  max\_items/(log n/ log log n) &  Standard Deviation \\
+    n & k &            &                     &                               &                     \\
+    \midrule
+    1000    & 1 &          5 &            2.587128 &                      1.398895 &            1.027619 \\
+            & 2 &          3 &            1.552277 &                      0.839337 &            0.711337 \\
+            & 3 &          2 &            1.034851 &                      0.559558 &            0.589915 \\
+    10000   & 1 &          8 &            3.603073 &                      1.928551 &            1.001798 \\
+            & 2 &          3 &            1.351152 &                      0.723207 &            0.705833 \\
+            & 3 &          3 &            1.351152 &                      0.723207 &            0.595483 \\
+    100000  & 1 &          8 &            3.274032 &                      1.697897 &            1.001868 \\
+            & 2 &          4 &            1.637016 &                      0.848949 &            0.702382 \\
+            & 3 &          3 &            1.227762 &                      0.636711 &            0.594559 \\
+    1000000 & 1 &          9 &            3.427537 &                      1.710550 &            1.000499 \\
+            & 2 &          4 &            1.523350 &                      0.760245 &            0.704036 \\
+            & 3 &          3 &            1.142512 &                      0.570183 &            0.595970 \\
+    \bottomrule
+    \end{tabular}
+
+    \caption{$k$ choice hashing for different values of $n$}
+    \label{tab:q4_result}
+\end{table}
+
+For k = 1, max\_items grow at the rate $O(logn/loglogn)$. For k>1, max\_items grows at the rate $O(loglogn)$ and    onstant factor decreases with increase in $k$ . Standard deviation is also lower for higher $k$ which means the distribution of items in buckets are more even with higher $k$.
+
+\begin{figure}
+    \centering
+    \includegraphics{images/range_k.png}
+    \caption{k-choice hashing performance as k ranges from 1 to n}
+    \label{fig:my_label}
+\end{figure}
+\begin{python}
+import random
+import numpy as np
+import logging
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+class KchoiceHashing():
+    def __init__(self, n, k):
+        self.n = n
+        self.k = k
+        # Buckets only store counts in this simulation.
+        self.buckets = [0] * self.n #nothing is assigned to the buckets yet
+        self.logger = logging.getLogger(name = __name__)
+        # random hash functions with different seeds.
+        # Each hash function is a random number generator.
+        self.h = [random.Random(i) for i in range(k)]
+
+    def assign_item(self, item = None):
+        '''Assigns a new item to a bucket.
+        For this simulation, we don't need to assign actual items.
+        We will just increment item count in the assigned bucket 
+        '''
+        # Compute hash functions and shortlist buckets
+        selected_buckets = [h.randint(0, n-1) for h in self.h]
+        current_items = np.array([self.buckets[b] for b in selected_buckets])
+        # select bucket with least amount of items in it
+        min_bucket = selected_buckets[np.argmin(current_items)]
+
+        self.logger.debug(f'selected bucket {min_bucket} from {selected_buckets}')
+
+        # assign item to that bucket
+        self.buckets[min_bucket] += 1
+
+        self.logger.debug(self.buckets)
+
+    def assign_n_items(self):
+        for i in range(n):
+            self.logger.debug(f'iteration {i}')
+            self.assign_item(i)
+    
+    def max_items(self):
+        return max(self.buckets)
+
+    def std(self):
+        return np.array(self.buckets).std()
+
+import pandas as pd
+if __name__ == '__main__':
+
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(name = __name__)
+    series = []
+    for n in [1_000,10_000,100_000,1_000_000]:
+        for k in [1,2,3]:
+            hashing = KchoiceHashing(n,k)
+            hashing.assign_n_items()
+            max_items = hashing.max_items()
+            ratio = max_items/np.log(np.log(n))
+            ratio2 = max_items/(np.log(n)/np.log(np.log(n)))
+            s = {
+                'n':n,
+                'k':k,
+                'max_items':max_items,
+                'max_items/log logn': ratio,
+                'max_items/(log n/ log log n)': ratio2,
+                'standard Deviation':hashing.std()
+            }
+            series.append(s) 
+            logger.info(f'n = {n}, k = {k}, max_items = {max_items}, ratio = {ratio:.3}, std = {hashing.std():.3}')
+    df = pd.DataFrame(series)
+    df = df.set_index(['n','k'])
+    print(df.to_latex())
+
+    df.to_csv('q4_out.csv')
+    
+    
+    n = 1024
+    vals = {}
+    for k in range(0,int(np.log2(n))+1):
+        print(k)
+        k = 2**k
+        print(k)
+        hashing = KchoiceHashing(n,k)
+        hashing.assign_n_items()
+        max_items = hashing.max_items()
+        vals[k]= max_items
+    plt.plot(vals.keys(), vals.values())
+    plt.xlabel('k')
+    plt.ylabel('max_items')
+    
+    plt.show()
+\end{python}
+
 
 \end{document}

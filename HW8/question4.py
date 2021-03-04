@@ -42,12 +42,20 @@ class DocData:
         docsB = self.label_doc_map[groupB]
         for idA in docsA:
             for idB in docsB:
-                print(idA,idB)
+                # print(idA,idB)
                 sim = sim_fun(self.doc_bow[idA], self.doc_bow[idB])
                 sumscores += sim
-                print(sim)
+                # print(sim)
 
         return sumscores/(len(docsA)* len(docsB))
+    def get_avg_sim_matrix(self, sim_fun):
+        rows = []
+        for l1 in self.label_doc_map.keys():
+            print(l1)
+            rows.append(
+                [self.find_average_similarity(l1,l2, sim_fun) for l2 in self.label_doc_map.keys()] 
+            )
+        return np.array(rows)
 
 def get_xy_forsim(x:Counter, y:Counter):
     # print(x,y)
@@ -104,6 +112,7 @@ if __name__ =='__main__':
     )) # should be near to -1
 
     #print(c.find_average_similarity(1,1, cosine))
-    c.find_average_similarity(1,1, cosine)
+    # c.find_average_similarity(1,1, cosine)
+    print(c.get_avg_sim_matrix(cosine))
     # get_xy_forsim(c.doc_bow[5],c.doc_bow[44])
 

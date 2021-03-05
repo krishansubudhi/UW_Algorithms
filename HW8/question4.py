@@ -12,14 +12,14 @@ class SimCalculator:
         self.label_doc_map = self.create_label_doc_map(labels_file)
         self.doc_label_map = self.create_doc_label_map(labels_file)
         self.label_name_map = self.create_label_name_map(group_file)
-        self.labels = range(1, len(self.label_doc_map.keys())+1)
+        self.labels = range(1, len(self.label_doc_map.keys())+1)#[:5]
         self.label_names = [self.label_name_map[id] for id in self.labels]
     
     def create_doc_bow(self,data_file):
         doc_bow = defaultdict(Counter)
         with open(data_file,'r') as f:
             lines = f.readlines()
-            for line in lines[:10000]:#remove
+            for line in lines:#remove
                 columns = line.split(',')
                 doc_bow[int(columns[0])][int(columns[1])] += int(columns[2])
         return doc_bow
@@ -77,11 +77,10 @@ class SimCalculator:
             nns = [0]*len(self.labels)#no nn at the beginning
             print(f'Processing for group {l1}')
             for idA in self.label_doc_map[l1]:
-                for idB in self.doc_label_map.keys():
-                    sims = [-np.inf if self.doc_label_map[idB] == self.doc_label_map[idA] 
-                                else sim_fun(self.doc_bow[idA], self.doc_bow[idB]) 
-                                for idB in range(1, len(self.doc_label_map)+1)]
-                    sims = np.array(sims)
+                sims = [-np.inf if self.doc_label_map[idB] == self.doc_label_map[idA] 
+                            else sim_fun(self.doc_bow[idA], self.doc_bow[idB]) 
+                            for idB in range(1, len(self.doc_label_map)+1)]
+                sims = np.array(sims)
                 most_similar_doc = np.argmax(sims)+1
                 most_similar_label = self.doc_label_map[most_similar_doc]
                 nns[most_similar_label-1]+=1
@@ -122,11 +121,15 @@ def l2(x:Counter, y:Counter):
 
 
 if __name__ =='__main__':
-    folder = 'test_data/'
+
+    import pickle
+    folder = 'data/'
     c = SimCalculator(folder+'data50.csv', folder+'label.csv', folder+'groups.csv')
-    print(c.doc_bow)
-    print(c.label_doc_map)
-    print(c.label_name_map)
+    with open('data.pkl', 'wb') as f:
+        pickle.dump(c, f)
+    # print(c.doc_bow)
+    # print(c.label_doc_map)
+    # print(c.label_name_map)
 
     assert jaccard(
         x = Counter({0:2}),
@@ -145,13 +148,18 @@ if __name__ =='__main__':
 
     #print(c.find_average_similarity(1,1, cosine))
     # c.find_average_similarity(1,1, cosine)
-    result = c.get_avg_sim_matrix(jaccard)
-    print(result)
+    
 
     #plot heatmap
 
-    makeHeatMap(result, c.label_names, 'viridis', 'heatmap.png')
+    for metric in ['jaccard', 'cosine', 'l2']:
+        print(metric)
+        result = c.get_avg_sim_matrix(eval(metric))
+        makeHeatMap(result, c.label_names, 'viridis', f'avg_similarity_{metric}.png')
+        print(result)
 
     nn = c.get_nn_matrix(jaccard)
+
+    makeHeatMap(nn, c.label_names, 'viridis', 'nn_heatmap.png')
     print(nn)
 

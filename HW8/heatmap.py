@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+import warnings
+import numpy as np
 
 def makeHeatMap(data, names, color, outputFileName):
     #to catch "falling back to Agg" warning
@@ -18,10 +20,23 @@ def makeHeatMap(data, names, color, outputFileName):
         ax.invert_yaxis()
         ax.xaxis.tick_top()
 
-        ax.set_xticklabels(range(1, 21))
+        label_count = len(names)
+        ax.set_xticklabels(range(1, label_count+1))
         ax.set_yticklabels(names)
 
         plt.tight_layout()
 
         plt.savefig(outputFileName, format = 'png')
         plt.close()
+
+if __name__ == "__main__":
+    import numpy as np
+    data = np.array(
+        [
+            [0,1]*10
+        ]*20
+    )
+    names = range(1,21)
+    color = 'viridis'
+    outputFileName = 'heatmap.png'
+    makeHeatMap(data, names, color, outputFileName)

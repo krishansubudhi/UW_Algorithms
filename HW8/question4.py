@@ -1,15 +1,19 @@
-# from heatmap import makeHeatMap
+from heatmap import makeHeatMap
 import numpy as np
 import pandas as pd
 # import matplotlib.pyplot as plt
 from collections import defaultdict, Counter
 import math
 
-class DocData:
+
+class SimCalculator:
     def __init__(self,data_file, labels_file,group_file):
         self.doc_bow = self.create_doc_bow(data_file)#defaultdict(Counter)
         self.label_doc_map = self.create_label_doc_map(labels_file)
+        self.doc_label_map = self.create_doc_label_map(labels_file)
         self.label_name_map = self.create_label_name_map(group_file)
+        self.labels = range(1, len(self.label_doc_map.keys())+1)
+        self.label_names = [self.label_name_map[id] for id in self.labels]
     
     def create_doc_bow(self,data_file):
         doc_bow = defaultdict(Counter)
@@ -27,6 +31,15 @@ class DocData:
             for i, line in enumerate(lines):
                 label_doc_map[int(line)].append(i+1)
         return label_doc_map
+    
+    def create_doc_label_map(self, label_file):
+        doc_label = {}
+        with open(label_file,'r') as f:
+            lines = f.readlines()
+            for i, line in enumerate(lines):
+                doc_label[i+1] = int(line)
+        return doc_label
+
 
     def create_label_name_map(self, group_file):
         label_name_map = {}
@@ -35,6 +48,7 @@ class DocData:
             for i, line in enumerate(lines):
                 label_name_map[i+1] = line.strip()
         return label_name_map
+    
 
     def find_average_similarity(self,groupA, groupB, sim_fun):
         sumscores = 0
@@ -50,11 +64,28 @@ class DocData:
         return sumscores/(len(docsA)* len(docsB))
     def get_avg_sim_matrix(self, sim_fun):
         rows = []
-        for l1 in self.label_doc_map.keys():
-            print(l1)
+        for l1 in self.labels:
+            print(f'Processing for group {l1}')
             rows.append(
-                [self.find_average_similarity(l1,l2, sim_fun) for l2 in self.label_doc_map.keys()] 
+                [self.find_average_similarity(l1,l2, sim_fun) for l2 in self.labels] 
             )
+        return np.array(rows)
+
+    def get_nn_matrix(self, sim_fun):
+        rows = []
+        for l1 in self.labels:
+            nns = [0]*len(self.labels)#no nn at the beginning
+            print(f'Processing for group {l1}')
+            for idA in self.label_doc_map[l1]:
+                for idB in self.doc_label_map.keys():
+                    sims = [-np.inf if self.doc_label_map[idB] == self.doc_label_map[idA] 
+                                else sim_fun(self.doc_bow[idA], self.doc_bow[idB]) 
+                                for idB in range(1, len(self.doc_label_map)+1)]
+                    sims = np.array(sims)
+                most_similar_doc = np.argmax(sims)+1
+                most_similar_label = self.doc_label_map[most_similar_doc]
+                nns[most_similar_label-1]+=1
+            rows.append(nns)
         return np.array(rows)
 
 def get_xy_forsim(x:Counter, y:Counter):
@@ -76,7 +107,7 @@ def jaccard(x:Counter, y:Counter):
 def cosine(x:Counter, y:Counter):
     x,y = get_xy_forsim(x,y)#list of dims
     # print(x,y)
-    num = sum([xi*yi for xi,yi in zip(x,y)])
+    num = sum(x*y)
     den = np.linalg.norm(x)* np.linalg.norm(y)
     return num/den
 
@@ -91,28 +122,36 @@ def l2(x:Counter, y:Counter):
 
 
 if __name__ =='__main__':
-    c = DocData('data50.csv', 'label.csv', 'groups.csv')
-    # print(c.doc_bow.keys(), c.doc_bow[1])
-    # print(c.label_doc_map)
-    # print(c.label_name_map)
+    folder = 'test_data/'
+    c = SimCalculator(folder+'data50.csv', folder+'label.csv', folder+'groups.csv')
+    print(c.doc_bow)
+    print(c.label_doc_map)
+    print(c.label_name_map)
 
     assert jaccard(
         x = Counter({0:2}),
         y = Counter({0:1})
     ) ==0.5
 
-    print(    cosine(
+    print('cosine',cosine(
         x = Counter({0:2}),
         y = Counter({0:1})
     )) # should be near to 1
 
-    print(    l2(
+    print('L2',l2(
         x = Counter({0:2}),
         y = Counter({0:1})
     )) # should be near to -1
 
     #print(c.find_average_similarity(1,1, cosine))
     # c.find_average_similarity(1,1, cosine)
-    print(c.get_avg_sim_matrix(cosine))
-    # get_xy_forsim(c.doc_bow[5],c.doc_bow[44])
+    result = c.get_avg_sim_matrix(jaccard)
+    print(result)
+
+    #plot heatmap
+
+    makeHeatMap(result, c.label_names, 'viridis', 'heatmap.png')
+
+    nn = c.get_nn_matrix(jaccard)
+    print(nn)
 

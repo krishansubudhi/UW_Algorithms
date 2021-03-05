@@ -1,0 +1,93 @@
+\documentclass{homeworg}
+
+\title{CSEP 521, Winter 2021: Homework 8}
+\author{Krishan Subudhi (ksubudhi@uw.edu) - 2040900}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{pythonhighlight}
+\usepackage{enumitem}
+\usepackage{array}
+
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage{placeins}
+
+\let\Oldsubsection\subsection
+\renewcommand{\subsection}{\FloatBarrier\Oldsubsection}
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+\begin{document}
+
+\maketitle
+
+\exercise
+\emph{Q: Is the $L^{1/2}$ norm a proper distance function (a metric)? Prove or disprove.}
+
+\begin{equation}
+\label{eq:1}
+    ||(x, y)||_{1/2} =  (\sqrt{|x|}+\sqrt{|y|})^2
+\end{equation}
+
+The properties of a proper distance function are:
+\begin{align*}
+1. d(x,y) &= 0 iff x = y\\
+2. d(x,y) &= d(y,x) \\
+3. d(x,y) &\le d(x,z) + d(z,y)\\ 
+4. d(x,y) &\ge 0
+\end{align*}
+$L^{1/2}$  does not always satisfy property 3 for all combination of $x$ and $y$. Hence it is not a proper distance function.
+
+Let's take one example in 2d.
+\begin{align*}
+x = (0,1)\\
+y = (1,0)\\
+z = (0,0)\\
+d(x,y) = (1+1)^2 = 4\\
+d(x,z) = (0+1)^2 = 1\\
+d(y,z) = (1+0)^2 = 1\\
+\\
+d(x,z) +d(y,z)  = 2\\
+d(x,y) > d(x,z) + d(z,y)
+\end{align*}
+    
+Since for the above example, the property $d(x,y) \le d(x,z) + d(z,y)$ does not hold true, $L^{1/2}$ norm is not a proper distance function.
+
+\newpage
+\exercise
+
+\emph{Q. Suppose that $|U| = n$ and you select random subsets, $A \subseteq U$ and $B \subseteq U$ with $|A| = m$ and $|B| = m$. What is the expected size of $A \cap B$?}
+
+Let $X_i$ be an indicator random variable with values
+$$
+X_i=\begin{cases}
+			1, & \text{if $i^{th}$ element is present in both A and B}\\
+            0, & \text{otherwise}
+		 \end{cases}
+$$
+\begin{align*}
+E[|A \cap B|] &= E[\sum_{i=1}^n{X_i}]\\
+&=\sum_{i=1}^n{E[X_i]}\\
+&= n \ast E[X_i]\\
+&= n \ast P(X_i =1)\\
+&= n \ast P(i \ in \ A) \ast P(i \ in \ B)\\
+&= n \ast m/n \ast m/n\\
+&= \frac{m^2}{n}
+\end{align*}
+
+\emph{Q: Give an expression for the value of the Jaccard similarity of A and B if $m = n/k$}
+$$
+J(A,B) = \frac{|A \cap B|}{|A \cup B|}
+$$
+if $m = n/k$, 
+\begin{align*}
+    E[|A \cap B|] &=  \frac{m^2}{n} = \frac{n}{k^2}\\
+    E[|A \cup B|] &=  E[|A| + |B| - |A \cap B|]\\
+    & = \frac{2n}{k} - \frac{n}{k^2}\\
+    & = \frac{n}{k^2} (2k- 1)\\
+    J(A,B) &= \frac{|A \cap B|}{|A \cup B|}\\
+    &=\frac{1}{2k-1}
+\end{align*}
+
+Hence $J \alpha \frac{1}{k}$. This means that for uncorrelated data, as $k$ decreases (i.e. subset size increases), Jaccard similarity increases.
+\end{document}
